@@ -1,0 +1,164 @@
+HOW TO SET UP REMOTE CONTROL FOR LINUX (lirc)
+
+Using a infrared (IR) remote control for Linux consists of getting
+several pieces to be configured correctly, and to talk to each other
+correctly.
+
+STEP 1 -- install Lirc
+
+apt-get install lirc
+
+STEP 2 -- configure your remote
+
+In this case, I have a Microsoft Media Center remote. Therein the problems start. It
+has a Vista logo, but is marked "HP" on the bottom, and is recognized
+as a "Philips" USB device:
+
+$ lsusb
+Bus 005 Device 002: ID 0471:060c Philips 
+
+To tell Lirc which remote you have, type:
+
+$ sudo dpkg-reconfigure lirc
+
+and follow the prompts.  This changes settings in /etc/lirc/lircd.conf
+and probably other files.
+
+To verify this worked, use the "show cooked codes" command and press
+keys on your remote.  To quit, press control-C.
+
+$ irw
+000000037ff07bed 00 ChanUp mceusb
+000000037ff07bed 01 ChanUp mceusb
+000000037ff07bf2 00 Home mceusb
+000000037ff07bf2 01 Home mceusb
+
+At this point, your remote works, and your computer is correctly
+translating the bitstream into keys.
+
+STEP 3 -- translate keys into actions
+
+Add this to your ~/.lircrc file:
+
+begin
+        prog   = irexec
+        button = Home
+        config = echo "Hello world!"
+end
+
+To test this, run the "how does program X translate key Y" command,
+ircat.  In this case, we're intercepting the irexec command:
+
+$ ircat irexec
+<press Home key>
+echo "Hello world!"
+
+Once the translation step works correctly, run it for real:
+
+$ irexec
+<press Home key>
+Hello world!
+
+STEP 4 -- translate keys into "smart" actions (VLC media player)
+
+Change your ~/.lircrc file into this:
+
+begin
+        prog   = irexec
+        button = Home
+        config = echo "Hello world!"
+end
+begin
+        prog   = vlc
+        button = Home
+        config = key-stop
+end
+
+Start irexec again, and also VLC on a video:
+
+$ killall irexec
+$ irexec &
+$ vlc mymovie.avi
+
+Pressing "Home" should stop the video, but it doesn't work -- VLC has
+to know to subscribe to Lirc events:
+
+$ vlc --control lirc sample.avi 
+
+When Home is pressed on the remote, Lirc sends the event to *all*
+applications that are interested. In this case, pressing Home prints
+"Hello world!" in the terminal, and the movie stops.
+
+The Lirc service, lircd, grabs infrared data from the USB device and
+translates it to button names. In this case, it knows I
+have a Media Center remote "mce", so the IR squiggles it got when I
+pushed the Home button, it understands as "the user pressed the Home
+button". 
+
+Each application subscribes to Lirc events. The lircd service
+translates specific buttons for specific applications. In this case,
+the "vlc" media player received the "key-stop" message, and it stopped
+the video. The "irevent" application also received a message, in this
+case the "echo hello world" string, so it printed a message to the
+terminal.
+
+If something goes wrong, look at each part of the setup:
+
+- IR signals to buttons with lircd
+
+	"irw" displays buttons
+
+- buttons to actions
+
+  	  "ircat vlc" shows actions for a specific program, in this
+	  case vlc
+
+	  "irexec" does things directly, like printing messages
+
+
+Different applications understand different messages.  Many programs
+don't understand remote buttons at all, so an intermediate programs is
+used to do the translation.
+
+
+STEP 5 -- translate buttons into "dumb" mouse/keyboard events (Google Chrome)
+
+Add this to ~/.lircrc:
+
+begin
+	prog = irxevent
+	button = Home
+	config = Key CTRL-t CurrentWindow
+end
+
+Test the mapping:
+
+$ ircat irxevent
+<Home key pressed>
+Key CTRL-t CurrentWindow
+
+Now run irxevent directly.  It intercepts the Home button, then sends
+a keypress to the current window. In this case, Control-T on a Google
+Chrome window opens up a new tab.
+
+$ killall irxevent ; irxevent
+
+
+Hope this helps!
+
+- john
+
+
+REFERENCES:
+
+- lircd.conf, mapping buttons to actions:
+
+http://www.lirc.org/html/configure.html#lircd.conf
+
+- keys for Google Chrome:
+
+http://www.mythtv.org/wiki/MCE_Remote#Phillips_eHome
+
+- VLC
+
+http://en.gentoo-wiki.com/wiki/VLC/LIRC

@@ -59,17 +59,6 @@
 
 # :::::::::::::::::::::::::::::::::::::::::::::::::: GLOBAL/MODES
 
-# begin
-#         prog   = irexec
-#         button = Print
-#         config = notify-send "WOOHOO"
-# end
-# begin
-#         prog   = irexec
-#         button = Print
-#         config = echo "Hello world!"
-# end
-
 # irxevent - infrared X-event sender
 
 # channel: page up/down
@@ -128,165 +117,158 @@ begin
 end
 
 
-# # :::::::::::::::::::::::::::::::::::::::::::::::::: VLC
+# :::::::::::::::::::::::::::::::::::::::::::::::::: VLC
 
+begin
+ prog = vlc
+ button = forward
+ config = key-jump+short
+end
+begin
+ prog = vlc
+ button = rewind
+ config = key-jump-short
+end
+begin
+ prog = vlc
+ button = DVD
+ config = key-disc-menu
+end
+begin
+ prog = vlc
+ button = Up
+ config = key-nav-up
+end
+begin
+ prog = vlc
+ button = Down
+ config = key-nav-down
+end
+begin
+ prog = vlc
+ button = Left
+ config = key-nav-left
+end
+begin
+ prog = vlc
+ button = Right
+ config = key-nav-right
+end
+begin
+ prog = vlc
+ button = OK
+ config = key-nav-activate
+end
+begin
+ prog = vlc
+ button = Skipfwd
+ config = key-jump+medium
+end
+begin
+ prog = vlc
+ button = Skipback
+ config = key-jump-medium
+end
+
+
+# traditional settings:
+
+begin
+ prog = vlc
+ button = play
+ config = key-play-pause
+end
+begin
+ prog = vlc
+ button = pause
+ config = key-play-pause
+end
+begin
+ prog = vlc
+ button = stop
+ config = key-stop
+end
+begin
+ prog = vlc
+ button = skip
+ config = key-jump+medium
+end
+begin
+ prog = vlc
+ button = replay
+ config = key-jump-short
+end
 # begin
 #  prog = vlc
 #  button = forward
-#  config = key-jump+short
+#  config = key-next
 # end
 # begin
 #  prog = vlc
 #  button = rewind
-#  config = key-jump-short
-# end
-
-
-# begin
-#  prog = vlc
-#  button = DVD
-#  config = key-disc-menu
+#  config = key-prev
 # end
 # begin
 #  prog = vlc
-#  button = Up
+#  button = up
 #  config = key-nav-up
 # end
 # begin
 #  prog = vlc
-#  button = Down
+#  button = down
 #  config = key-nav-down
 # end
 # begin
 #  prog = vlc
-#  button = Left
-#  config = key-nav-left
+#  button = left
+#  config = key-lav-left
 # end
 # begin
 #  prog = vlc
-#  button = Right
-#  config = key-nav-right
+#  button = right
+#  config = key-right
+# end
+begin
+ prog = vlc
+ button = volup
+ config = key-vol-up
+ repeat = 1
+end
+begin
+ prog = vlc
+ button = voldown
+ config = key-vol-down
+ repeat = 1
+end
+begin
+ prog = vlc
+ button = mute
+ config = key-vol-mute
+end
+# begin
+#  prog = vlc
+#  button = pictures
+#  config = key-audiodelay-up
 # end
 # begin
 #  prog = vlc
-#  button = OK
-#  config = key-nav-activate
+#  button = music
+#  config = key-audiodelay-down
 # end
-# begin
-#  prog = vlc
-#  button = Skipfwd
-#  config = key-jump+medium
-# end
-# begin
-#  prog = vlc
-#  button = Skipback
-#  config = key-jump-medium
-# end
-
-
-# # traditional settings:
-
-# begin
-#  prog = vlc
-#  button = play
-#  config = key-play-pause
-# end
-# begin
-#  prog = vlc
-#  button = pause
-#  config = key-play-pause
-# end
-# begin
-#  prog = vlc
-#  button = stop
-#  config = key-stop
-# end
-# begin
-#  prog = vlc
-#  button = skip
-#  config = key-jump+medium
-# end
-# begin
-#  prog = vlc
-#  button = replay
-#  config = key-jump-short
-# end
-# # begin
-# #  prog = vlc
-# #  button = forward
-# #  config = key-next
-# # end
-# # begin
-# #  prog = vlc
-# #  button = rewind
-# #  config = key-prev
-# # end
-# # begin
-# #  prog = vlc
-# #  button = up
-# #  config = key-nav-up
-# # end
-# # begin
-# #  prog = vlc
-# #  button = down
-# #  config = key-nav-down
-# # end
-# # begin
-# #  prog = vlc
-# #  button = left
-# #  config = key-lav-left
-# # end
-# # begin
-# #  prog = vlc
-# #  button = right
-# #  config = key-right
-# # end
-# begin
-#  prog = vlc
-#  button = volup
-#  config = key-vol-up
-#  repeat = 1
-# end
-# begin
-#  prog = vlc
-#  button = voldown
-#  config = key-vol-down
-#  repeat = 1
-# end
-# begin
-#  prog = vlc
-#  button = mute
-#  config = key-vol-mute
-# end
-# # begin
-# #  prog = vlc
-# #  button = pictures
-# #  config = key-audiodelay-up
-# # end
-# # begin
-# #  prog = vlc
-# #  button = music
-# #  config = key-audiodelay-down
-# # end
-# # begin
-# #  prog = vlc
-# #  button = more
-# #  config = key-crop
-# # end
-# # begin
-# #  prog = vlc
-# #  button = more
-# #  config = key-crop
-# # end
-
 # begin
 #  prog = vlc
 #  button = more
-#  config = key-toggle-fullscreen
+#  config = key-crop
+# end
+# begin
+#  prog = vlc
+#  button = more
+#  config = key-crop
 # end
 
-# # :::::::::::::::::::::::::::::::::::::::::::::::::: DESKTOP
+begin
+ prog = vlc
+ button = more
+ config = key-toggle-fullscreen
+end
 
-# # begin desktop
-# # begin
-# # 	prog = irxevent

@@ -1,0 +1,292 @@
+# http://en.gentoo-wiki.com/wiki/VLC/LIRC
+
+# /usr/share/lirc/remotes/mceusb/lircd.conf.mceusb
+# awk '/0x/ && !/B[ABCD]/ {print $1}' /usr/share/lirc/remotes/mceusb/lircd.conf.mceusb | sort -u | pr -5t
+# *	      Chdown	    Home	  rc6_mask	Start
+# #	      Chup	    Left	  Rec		Stop
+# 0	      Clear	    LiveTV	  Record	Teletext
+# 1	      Down	    More	  RecTV		Three
+# 2	      DVD	    Music	  Red		toggle_bit_ma
+# 3	      Eight	    Mute	  Replay	TV
+# 4	      Eject	    Nine	  Rewind	Two
+# 5	      Enter	    OK		  Right		Up
+# 6	      Five	    One		  Rwd		Videos
+# 7	      Forward	    Pause	  Seven		Visualization
+# 8	      Four	    Pictures	  Six		Voldown
+# 9	      Foward	    Play	  Skip		VolDown
+# Aspect      Fwd	    Power	  Skipback	Volup
+# Back	      Green	    pre_data	  Skipfwd	VolUp
+# Blue	      Guide	    Print	  SlideShow	Yellow
+# ChanDown      Hash	    Radio	  Star		Zero
+# ChanUp
+
+# vlc -H | perl -ne '/--(key-\S+)/ && print $1."\n"' | sort -u | pr -3t
+# key-aspect-ratio	key-menu-left		key-set-bookmark10
+# key-audiodelay-down	key-menu-off		key-set-bookmark2
+# key-audiodelay-up	key-menu-on		key-set-bookmark3
+# key-audiodevice-cycle	key-menu-right		key-set-bookmark4
+# key-audio-track	key-menu-select		key-set-bookmark5
+# key-chapter-next	key-menu-up		key-set-bookmark6
+# key-chapter-prev	key-nav-activate	key-set-bookmark7
+# key-crop		key-nav-down		key-set-bookmark8
+# key-crop-bottom	key-nav-left		key-set-bookmark9
+# key-crop-left		key-nav-right		key-slower
+# key-crop-right	key-nav-up		key-snapshot
+# key-crop-top		key-next		key-stop
+# key-decr-scalefactor	key-pause		key-subdelay-down
+# key-deinterlace	key-play		key-subdelay-up
+# key-disc-menu		key-play-bookmark1	key-subtitle-track
+# key-dump		key-play-bookmark10	key-title-next
+# key-faster		key-play-bookmark2	key-title-prev
+# key-frame-next	key-play-bookmark3	key-toggle-autoscale
+# key-history-back	key-play-bookmark4	key-toggle-fullscreen
+# key-history-forward	key-play-bookmark5	key-uncrop-bottom
+# key-incr-scalefactor	key-play-bookmark6	key-uncrop-left
+# key-intf-hide		key-play-bookmark7	key-uncrop-right
+# key-intf-show		key-play-bookmark8	key-uncrop-top
+# key-jump-extrashort	key-play-bookmark9	key-unzoom
+# key-jump+extrashort	key-play-pause		key-vol-down
+# key-jump-long		key-position		key-vol-mute
+# key-jump+long		key-prev		key-vol-up
+# key-jump-medium		key-quit		key-wallpaper
+# key-jump+medium		key-random		key-zoom
+# key-jump-short		key-rate-faster-fine	key-zoom-double
+# key-jump+short		key-rate-normal		key-zoom-half
+# key-leave-fullscreen	key-rate-slower-fine	key-zoom-original
+# key-loop		key-record		key-zoom-quarter
+# key-menu-down		key-set-bookmark1
+
+
+# :::::::::::::::::::::::::::::::::::::::::::::::::: GLOBAL/MODES
+
+# begin
+#         prog   = irexec
+#         button = Print
+#         config = notify-send "WOOHOO"
+# end
+# begin
+#         prog   = irexec
+#         button = Print
+#         config = echo "Hello world!"
+# end
+
+# irxevent - infrared X-event sender
+
+# channel: page up/down
+# next/prev track: change tabs
+# back: new tab
+# moreinfo: toggle fullscreen
+# left/right/ok: change, select Preview
+# volume, mute: leave for global volume
+#
+# http://www.google.com/support/chrome/bin/answer.py?answer=95743&ctx=tip
+#
+begin
+	prog = irxevent
+	button = Right
+	config = Key Tab CurrentWindow
+end
+begin
+	prog = irxevent
+	button = Left
+	config = Key SHIFT-Tab CurrentWindow
+end
+begin
+	prog = irxevent
+	button = OK
+	config = Key Return CurrentWindow
+end
+begin
+	prog = irxevent
+	button = More
+	config = Key F11 CurrentWindow
+end
+begin
+	prog = irxevent
+	button = ChanUp
+	config = Key Page_Up CurrentWindow
+end
+begin
+	prog = irxevent
+	button = ChanDown
+	config = Key Page_Down CurrentWindow
+end
+begin
+	prog = irxevent
+	button = Skip
+	config = Key CTRL-Page_Down CurrentWindow
+end
+begin
+	prog = irxevent
+	button = Replay
+	config = Key CTRL-Page_Up CurrentWindow
+end
+begin
+	prog = irxevent
+	button = Back
+	config = Key CTRL-t CurrentWindow
+end
+
+
+# # :::::::::::::::::::::::::::::::::::::::::::::::::: VLC
+
+# begin
+#  prog = vlc
+#  button = forward
+#  config = key-jump+short
+# end
+# begin
+#  prog = vlc
+#  button = rewind
+#  config = key-jump-short
+# end
+
+
+# begin
+#  prog = vlc
+#  button = DVD
+#  config = key-disc-menu
+# end
+# begin
+#  prog = vlc
+#  button = Up
+#  config = key-nav-up
+# end
+# begin
+#  prog = vlc
+#  button = Down
+#  config = key-nav-down
+# end
+# begin
+#  prog = vlc
+#  button = Left
+#  config = key-nav-left
+# end
+# begin
+#  prog = vlc
+#  button = Right
+#  config = key-nav-right
+# end
+# begin
+#  prog = vlc
+#  button = OK
+#  config = key-nav-activate
+# end
+# begin
+#  prog = vlc
+#  button = Skipfwd
+#  config = key-jump+medium
+# end
+# begin
+#  prog = vlc
+#  button = Skipback
+#  config = key-jump-medium
+# end
+
+
+# # traditional settings:
+
+# begin
+#  prog = vlc
+#  button = play
+#  config = key-play-pause
+# end
+# begin
+#  prog = vlc
+#  button = pause
+#  config = key-play-pause
+# end
+# begin
+#  prog = vlc
+#  button = stop
+#  config = key-stop
+# end
+# begin
+#  prog = vlc
+#  button = skip
+#  config = key-jump+medium
+# end
+# begin
+#  prog = vlc
+#  button = replay
+#  config = key-jump-short
+# end
+# # begin
+# #  prog = vlc
+# #  button = forward
+# #  config = key-next
+# # end
+# # begin
+# #  prog = vlc
+# #  button = rewind
+# #  config = key-prev
+# # end
+# # begin
+# #  prog = vlc
+# #  button = up
+# #  config = key-nav-up
+# # end
+# # begin
+# #  prog = vlc
+# #  button = down
+# #  config = key-nav-down
+# # end
+# # begin
+# #  prog = vlc
+# #  button = left
+# #  config = key-lav-left
+# # end
+# # begin
+# #  prog = vlc
+# #  button = right
+# #  config = key-right
+# # end
+# begin
+#  prog = vlc
+#  button = volup
+#  config = key-vol-up
+#  repeat = 1
+# end
+# begin
+#  prog = vlc
+#  button = voldown
+#  config = key-vol-down
+#  repeat = 1
+# end
+# begin
+#  prog = vlc
+#  button = mute
+#  config = key-vol-mute
+# end
+# # begin
+# #  prog = vlc
+# #  button = pictures
+# #  config = key-audiodelay-up
+# # end
+# # begin
+# #  prog = vlc
+# #  button = music
+# #  config = key-audiodelay-down
+# # end
+# # begin
+# #  prog = vlc
+# #  button = more
+# #  config = key-crop
+# # end
+# # begin
+# #  prog = vlc
+# #  button = more
+# #  config = key-crop
+# # end
+
+# begin
+#  prog = vlc
+#  button = more
+#  config = key-toggle-fullscreen
+# end
+
+# # :::::::::::::::::::::::::::::::::::::::::::::::::: DESKTOP
+
+# # begin desktop
+# # begin
+# # 	prog = irxevent

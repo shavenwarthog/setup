@@ -144,6 +144,13 @@ Chrome window opens up a new tab.
 $ killall irxevent ; irxevent
 
 
+TROUBLESHOOTING
+
+- use "irw" and "ircat <app>" liberally. Some button names are not
+  obvious.  The "1" button on the MCE remote is reported as "One."
+  The "Enter" key is sent with "Key Return".
+
+
 Hope this helps!
 
 - john
@@ -157,7 +164,7 @@ http://www.lirc.org/html/configure.html#lircd.conf
 
 - keys for Google Chrome:
 
-http://www.mythtv.org/wiki/MCE_Remote#Phillips_eHome
+http://www.google.com/support/chrome/bin/answer.py?hl=en&answer=95743
 
 - VLC
 

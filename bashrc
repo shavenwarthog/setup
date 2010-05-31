@@ -74,6 +74,7 @@ fi
 
 
 # export CDPATH=/usr/share/doc
+export CDPATH=$HOME/src
 
 # 
 # enable color support of ls and also add handy aliases

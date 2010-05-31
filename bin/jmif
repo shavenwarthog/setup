@@ -1,0 +1,519 @@
+#!/usr/bin/env python
+
+'''
+jmif -- smoothly handle ethernet/wireless Internet connection
+'''
+
+import logging, optparse, os, re, sys, time
+from itertools import ifilter, imap
+from nose.tools import eq_ as eq
+
+
+logging.basicConfig(
+    level=logging.DEBUG,
+    format='%(asctime)s %(levelname)s %(message)s',
+    # datefmt='%x %X',
+    # filename='/tmp/enose.log',
+    )
+
+
+def quote(word):
+    return "'%s'" % word
+
+def system(cmd, verbose=1):
+    if verbose > 0:
+        print '>>>',cmd
+    # if verbose < 2:
+    #     cmd += ' &> /dev/null'
+    return os.system(cmd)
+
+def parse_lines(pat, lines):
+    return (
+        m.groups() for m in ( 
+            pat.search(line) for line in lines
+            ) if m is not None
+        )
+
+
+def parse(lines, pat=None):
+    if pat is None:
+        pat = re.compile('(\S+)\s*[:=]\s*(.+)')
+    info = dict()
+    curnet = dict()
+    for name,value in parse_lines(
+        pat=pat,
+        lines=lines,
+        ):
+        if name=='Address':
+            if curnet:
+                info[curnet.get('ESSID')] = curnet
+            curnet = dict()
+        if name=='ESSID':
+            value = value.rstrip().strip("'").strip('"')
+        curnet[name] = value
+        if name=='Quality':
+            try:
+                top,bot = re.search(r'(\d+)/(\d+)', value).groups()
+                curnet['quality_num'] = 100. * int(top) / int(bot)
+            except (AttributeError, ValueError):
+                pass
+    info[curnet.get('ESSID')] = curnet
+    return info
+
+
+class NetKeys(dict):
+    '''
+    wireless network essids and keys, read from /etc/network/interfaces
+    '''
+    IGNORE = 'ignore'
+
+    def __init__(self, lines=None):
+        super(NetKeys,self).__init__()
+        self.read_keys(lines=lines)
+
+    def read_keys(self, lines=None):
+        # XX: assumes 'essid' given before 'key'
+        if lines is None:
+            lines = open('/etc/network/interfaces')
+        last_id = None
+        self.clear()
+        for wkey,wvalue in parse_lines(
+            pat=re.compile('\s*wireless-(\S+)\s+(.+)'),
+            lines=lines,
+            ):
+            if wkey=='essid':
+                last_id=wvalue
+                self[last_id] = None
+            elif wkey=='key':
+                wvalue = re.sub('[:\s]+', '', wvalue)
+                try:
+                    int(wvalue,16)
+                except ValueError:
+                    wvalue=self.IGNORE
+                self[last_id] = wvalue
+
+
+class NetScan(dict):
+    '''
+    list currently active wireless networks.
+    Requires wlan0 to be configured "up".
+    '''
+    def __init__(self, lines=None):
+        self.lines = None
+        super(NetScan,self).__init__()
+        self.scan(lines=lines)
+
+    def scan(self, lines=None):
+        if lines is None:
+            lines = os.popen('sudo ifconfig wlan0 up ; sudo iwlist wlan0 scan')
+        self.lines = list(lines)
+        if lines:
+            self.clear()
+            self.update( parse(self.lines) )
+
+def sec_label(wname, netkeys, winfo):
+    if netkeys.has_key(wname):
+        return 'private' if netkeys.get(wname) else 'public'
+    return 'open' if winfo.get('key')=='off' else 'closed'
+    
+
+
+def get_recv(intf='wlan0'):
+    '''
+    receive bytes for a single interface.
+    Returns (time, numbytes) or None.
+    '''
+    pat = re.compile('\s*(\S+[0-9]):\s*(\d+)')
+    info = dict(parse_lines(pat, open('/proc/net/dev')))
+    if not info.has_key(intf):
+        return None
+    return (time.time(), int(info[intf]))
+
+
+
+# def get_speed():
+#     pat = re.compile('\s*(\S+[0-9]):\s*(\d+)')
+#     before = dict(parse_lines(pat, open('/proc/net/dev')))
+#     time.sleep(1)
+#     after = dict(parse_lines(pat, open('/proc/net/dev')))
+#     speed = -1
+#     for intf in before.keys():
+#         speed = max(speed, int(after[intf]) - int(before[intf]))
+#     return speed
+
+def get_speed(data):
+    endtm,endbytes = data[-1]
+    for tm,bytes in reversed(data[:-1]):
+        if tm != endtm:
+            return (endbytes - bytes) / (endtm - tm)
+
+def get_speed_now(intf):
+    orig = get_recv(intf=intf)
+    time.sleep(1)
+    return get_speed( [orig] + [get_recv(intf=intf)] )
+
+def test_get_speed():
+    eq(get_speed([ (0,1), (1,10)  ]), 9)
+    eq(get_speed([ (0,1), (0,1)  ]), None)
+    assert get_speed_now() > -1
+
+
+class Network(object):
+    def ping_okay(self):
+        # send one packet, wait for at most five seconds
+        return not os.system('ping -c1 -w5 4.2.2.2 > /dev/null')
+
+    def current(self, lines=None):
+        '''
+        return ESSID of currently-connected wireless network, or None
+        '''
+        if lines is None:
+            lines = os.popen('iwconfig wlan0')
+        info = parse(lines)
+        if len(info)==1:
+            return info.keys()[0] # essid
+        return None
+
+    def interfaces(self, lines=None):
+        '''
+        return set of interface names
+        '''
+        if lines is None:
+            lines = os.popen('route -n')
+        return set(
+            matches[0] for matches in 
+            parse_lines(
+                pat=re.compile('\s(\S+[0-9])$'),
+                lines=lines,
+                )
+            )
+
+    CONFUSED = 'confused'
+    WIRELESS = 'wireless'
+    WIRED = 'wired'
+
+    def if_state(self):
+        ifaces = self.interfaces()
+        if ifaces not in ( set(['wlan0']), set(['eth0']) ):
+            return (self.CONFUSED, ifaces)
+        iface = list(ifaces)[0]
+        if iface.startswith('wlan'):
+            return (self.WIRELESS, iface)
+        return (self.WIRED, iface)
+
+    def switch_ethernet(self):
+        # TODO status
+        system('ifdown wlan0')
+        system('ifconfig wlan0 down')
+        system('dhclient eth0')
+        
+    def switch_wireless(self):
+        # TODO status
+        system('ifconfig eth0 down')
+        system('ifdown wlan0')
+        system('ifconfig wlan0 down')
+        system('ifconfig wlan0 up')
+
+    def configure(self, essid, key):
+        # TODO status
+        cmd = 'iwconfig wlan0 essid %s' % quote(essid)
+        if key is not None:
+            cmd += ' key %s' % quote(key)
+        st = system(cmd)
+        if st:
+            print >>sys.stderr, "iwconfig: %s" % st
+        return st
+
+    def dhclient(self):
+        return system('sudo dhclient wlan0', verbose=1)
+
+
+def print_state(net):
+    '''
+    return True if interface is down
+    '''
+    if not net.ping_okay():
+        print 'DOWN'
+        return True
+    (state, iface) = net.if_state()
+    if state==net.CONFUSED:
+        print 'confused'
+        return True
+    if state==net.WIRELESS:
+        print 'okay if=%s essid=%s' % (
+            iface, quote(net.current()),
+            )
+        return False
+    print 'okay if=%s' % iface
+    return False
+
+
+def get_goodnets(netkeys):
+    best = sorted(
+        NetScan().iteritems(), 
+        lambda a,b: cmp(a[1].get('quality_num'), b[1].get('quality_num')),
+        reverse=True,
+        )
+    goodnets = ifilter(
+        lambda (wname,_): 
+        netkeys.get(wname) != NetKeys.IGNORE, 
+        best)
+    goodnets = list(goodnets)
+
+    print 'scan: %d good networks (%d ignored)' % (
+        len(goodnets), len(best)-len(goodnets))
+    return goodnets
+
+
+def find_net(wname, goodnets):
+    wname = wname.lower()
+    for name,_ in goodnets:
+        if name and name.lower().startswith(wname):
+            return name
+    return None
+
+
+def connect(wname, winfo, netkeys):
+    '''
+    Connect to network with essid wname.
+    Return 0 on success, number on system error, True on skipped network.
+    '''
+    net = Network()
+    label = sec_label(wname, netkeys, winfo)
+    if label != 'closed':
+        # private, open, or public:
+        print '- connecting to %s network' % label
+        return net.configure(essid=wname, key=netkeys.get(wname))
+
+    detail = ''
+    if winfo.get('Cipher')=='TKIP':
+        detail = 'TKIP'
+    else:
+        detail = 'cipher=%s' % winfo.get('Cipher')
+    print '- unknown closed network, skipping (%s)' % detail
+    return True
+
+
+def scan_connect(pref=None):
+    '''
+    Scan wireless networks, connect to highest-quality or preferred
+    network. If connect fails, try the next one in quality order.
+    Return connected network name, or None.
+    '''
+    net = Network()
+    print 'reset: switching to wireless'
+    net.switch_wireless()
+
+    netkeys = NetKeys()
+    goodnets = get_goodnets(netkeys)
+    for wname,winfo in goodnets:
+        print '%3s%% %s' % (winfo.get('quality_num','?'), wname)
+    print
+
+    if pref:
+        prefnet = None
+        for idx,(wname,winfo) in enumerate(goodnets):
+            if wname==pref:
+                prefnet = idx
+        if prefnet is not None:
+            goodnets.insert(0, goodnets.pop(prefnet) )
+            
+    for num,(wname,winfo) in enumerate(goodnets):
+        print '#%d/%d %s'% (num+1, len(goodnets), wname)
+
+        if connect(wname, winfo, netkeys):
+            # skiping unknown private network, or configure failed
+            continue        
+        err = net.dhclient()
+        if err:
+            print 'dhclient:',err
+            continue
+        connected = net.ping_okay()
+        if connected:
+            return wname
+    return None
+
+
+def speedf():
+    KB = 1024.
+    log = [None, get_recv()]
+    while 1:
+        time.sleep(10)
+        log.pop(0)
+        log.append(get_recv())
+        yield get_speed(log) / KB 
+
+
+def speedchar(speed):
+    conf = [(10,	'_'),
+            (30,	'.'),
+            (50,	':'),
+            (100,	'+'),
+            (200,	'='),
+            (9e9,	'#'),
+            ]
+    for (rate,ch) in conf:
+        if speed < rate:
+            return ch
+    return '?'
+
+
+def strsize(nbytes):
+    K = 1024.
+    M = K*K
+    G = M*K
+    if nbytes>G:
+        return '%.1f GiB' % (nbytes/G)
+    elif nbytes > M:
+        return '%.1f MiB' % (nbytes/M)
+    return '%d KiB' % (nbytes/K)
+
+
+def fmt_logline(wname, orig_tm,orig_bytes):
+    now_tm,now_bytes = get_recv()
+    try:
+        total = strsize(now_bytes - orig_bytes)
+    except TypeError:
+        print sys.exc_info()
+        total = '?'
+    return 'essid=%s, uptime=%d sec, %s' % (
+        wname, 
+        now_tm - orig_tm,
+        total,
+        )
+
+def watch2():
+    SIZE = 20
+    log = []
+    orig_tm,orig_bytes = get_recv()
+    wname = Network().current()
+    logging.debug('essid=%s' % wname)
+    try:
+        for speed in speedf():
+            log.append(speed)
+            chart = ''.join( imap(speedchar, log) )
+            print '%3d %s' % (speed, chart)
+            if len(log) >= SIZE:
+                log = []
+                logging.debug( fmt_logline(wname, orig_tm, orig_bytes) )
+    except KeyboardInterrupt:
+        pass
+
+def watch(minspeed=15):
+    initlog = [9e9] * 5
+    log = initlog[:]
+    while True:
+        log.append( speed )
+        log.pop(0)
+        print '%4.f KiB/sec' % speed
+        if max(log) < minspeed:
+            print '- STALLED'
+            yield 'stalled'
+            for speed in speedf():
+                if speed > 0:
+                    break
+            log = initlog[:]
+        elif speed < minspeed:
+            print '- slow'
+
+def pwatch():
+    try:
+        for state in watch():
+            if state=='stalled':
+                print 'reconnecting...'
+                scan_connect()
+    except KeyboardInterrupt:
+        pass
+
+
+# def reconnect_on_stall():
+#     for state in 
+#         if 
+        
+
+def main():
+    parser = optparse.OptionParser()
+    # parser.add_option(
+    #     "-v", "--verbose",
+    #     action="store_true", dest="verbose", default=True,
+    #     )
+    (_, args) = parser.parse_args()
+
+    net = Network()
+    if not args:
+        return sys.exit( 1 if print_state(net) else 0 )
+
+    netkeys = NetKeys()
+
+    cmd = args[0]
+    if cmd.startswith('tog'):
+        ifaces = net.interfaces()
+        if ifaces==set(['eth0']):
+            cmd = 'wlan0'
+        elif ifaces==set(['wlan0']):
+            cmd = 'eth0'
+        else:
+            cmd = 'list'
+
+    if cmd=='speed':
+        ifaces = list(net.interfaces())
+        if len(ifaces) != 1:
+            print '? -- interfaces: %s' % ifaces
+            sys.exit(1)
+        cur = net.current()
+        print '%s: %.f KiB/sec%s' % (
+            ifaces[0], 
+            get_speed_now(intf=ifaces[0]) / 1024.,
+            ' (%s)' % cur if cur else '',
+            )        
+        return
+    elif cmd=='watch':
+        watch2()
+        # pwatch()
+        return 
+    elif cmd=='eth0':
+        net.switch_ethernet()
+        return print_state(net)
+    elif cmd=='list':
+        goodnets = get_goodnets(netkeys)
+        print 'NETWORKS:'
+        for num,(wname,winfo) in enumerate(goodnets):
+            qual = '%2d%%' % winfo['quality_num'] if winfo.has_key('quality_num') else ''
+            detail = sec_label(wname, netkeys, winfo)
+            print '%2d %-20s %s %s' % (
+                num+1,
+                wname,
+                qual,
+                detail,
+                )
+        return
+
+    # put preferred network at top of list
+    pref = None
+    goodnets = get_goodnets(netkeys)
+    if cmd != 'wlan0':
+        pref = find_net(cmd, goodnets)
+        if not pref:
+            print >>sys.stderr, "%s: preferred network not found" % cmd
+            sys.exit(1)
+
+    wname = None
+    try:
+        while True:
+            wname = scan_connect(pref=pref)
+            if wname:
+                break
+            print
+            print 'rescanning'
+            print
+            time.sleep(30)
+    except KeyboardInterrupt:
+        pass
+    if wname:
+        print 'done, connected to %s' % wname
+        return print_state(net)
+    else:
+        print 'cancelled'
+
+if __name__=='__main__':
+    main()

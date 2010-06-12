@@ -9,6 +9,7 @@
 
 (add-to-list 'load-path "~/.emacs.d/")
 (add-to-list 'load-path "~/.emacs.d/internet/")
+;; (add-to-list 'load-path "~/.emacs.d/internet/sml-mode-4.1")
 
 
 (defun jmc-eval-to-here ()

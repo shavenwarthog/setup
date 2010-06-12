@@ -4,8 +4,8 @@
 jmrip -- rip DVD, encode into single ISO
 '''
 
-import os, re, sys, time
-import pexpect
+import codecs, os, re, sys, time
+from subprocess import PIPE, Popen
 from itertools import ifilter, imap
 from nose.tools import eq_ as eq
 
@@ -32,17 +32,23 @@ class DzenStatus(dict):
 
     def __init__(self):
         super(DzenStatus,self).__init__(self.CONFIG)
-        self.dzen = pexpect.spawn(self.DZEN % (self.WORK_FG, self.WORK_BG))
+        pipe = Popen(
+            self.DZEN % (self.WORK_FG, self.WORK_BG),
+            shell=True, stdin=PIPE,
+            )
+        self.dzen = codecs.getwriter('utf-8')(pipe)
 
     def sendline(self, line):
-        self.dzen.sendline(line)
+        
+        self.dzen.stdin.write(line+'\n')
+        self.dzen.stdin.flush()
 
     def __getattr__(self, key):
         return self[key]
 
 def test_status():
     st = DzenStatus()
-    st.dzen.send(u'beer\u25d4')
+    st.sendline(u'beer\u25d4')
     time.sleep(5)
 
 class DVDInfo(dict):

@@ -1,0 +1,61 @@
+#!/usr/bin/env python
+
+'''
+apt-dlfast build-dep awesome
+'''
+
+import glob, os, re, subprocess, sys
+
+
+CACHEDIR = '/var/cache/apt/archives/'
+urlpat = re.compile("(http:.+?)'")
+
+avail = glob.glob('%s/*.deb' % CACHEDIR)
+avail += glob.glob('./*.deb')
+avail = set( (os.path.basename(name)
+              for name in avail) )
+
+# aptitude update
+pkglist = sys.argv[1:]
+cmd = 'install'
+if pkglist[0] in 'install build-dep':
+    cmd = pkglist.pop(0)
+
+# p = os.popen('apt-get -y --print-uris --show-upgraded upgrade | grep -o -e "http://[^\']+" \
+
+cmd = 'apt-get -y --print-uris %s %s' % (cmd,' '.join(pkglist))
+p = os.popen(cmd)
+urls = urlpat.findall(p.read())
+p.close()
+
+
+need = set( (url for url in urls
+             if os.path.basename(url) not in avail) )
+print '%3d packages, %d needed' % (len(urls), len(need))
+if not need:
+    sys.exit(0)                 # all done!
+
+need = [need.pop()]
+
+cmd = 'xargs -r -l3 -P5 wget -cnv'.split()
+cmd = ['echo'] + need + ['|'] + cmd
+cmd = ['echo'] + need + '| xargs echo'.split()
+
+print 'cmd',' '.join(cmd)
+
+getp = subprocess.Popen(
+    cmd, shell=True,
+    stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
+if getp.wait():
+    print 'error'
+print '>>>',getp.stdout.read()
+
+
+
+
+
+
+# aptitude -y safe-upgrade
+
+# sudo dpkg -A *deb
+# apt-get -y --dry-run --print-uris install libx11-dev

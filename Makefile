@@ -5,3 +5,6 @@ install:
 	-ln -s $(PWD)/licrc ~/.licrc
 	-ln -s $(PWD)/bin ~/bin
 	-ln -s $(PWD)/xmonad ~/.xmonad
+	-ln -s $(PWD)/wmii ~/.wmii-3.5
+
+

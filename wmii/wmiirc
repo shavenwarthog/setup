@@ -1,5 +1,6 @@
 #!/bin/sh -f
-# Configure wmii
+
+# JM: Configure wmii
 
 # Configuration Variables
 MODKEY=Mod4			# Super, not Alt
@@ -24,7 +25,8 @@ WMII_BROWSER='google-chrome'
 
 # Column Rules
 wmiir write /colrules <<!
-/.*/ -> 58+42
+62+38 # Golden Ratio
+# /.*/ -> 58+42
 !
 
 # Tagging Rules
@@ -35,10 +37,15 @@ wmiir write /tagrules <<!
 /.*/ -> 1
 !
 
-# Status Bar Info
-status() {
+# Status Bar Info in lower right corner
+# "0.31 0.34 0.29 | Sun Jun 27 17:26:54 PDT 2010"
+status_orig() {
 	echo -n $(uptime | sed 's/.*://; s/,//g') '|' $(date)
 }
+status() {
+    echo -n $(date '+%I:%M %p / %a %b %d')
+}
+
 
 # Event processing
 #  Processed later by `wmiiloop' and evaled.
@@ -134,6 +141,7 @@ eventstuff() {
 		wmiir xwrite /client/sel/ctl kill
 	Key $MODKEY-Shift-t
 		wmiir xwrite "/client/$(wmiir read /client/sel/ctl)/tags" "$(tagsmenu)" &
+
 	Key $MODKEY-$LEFT
 		wmiir xwrite /tag/sel/ctl select left
 	Key $MODKEY-$RIGHT
@@ -151,6 +159,9 @@ eventstuff() {
 	Key $MODKEY-Shift-$UP
 		wmiir xwrite /tag/sel/ctl send sel up
 
+# JM:
+	Key $MODKEY-Tab
+		wmiir xwrite /tag/sel/ctl select up
 	Key $MODKEY-b
 		eval $WMII_BROWSER &
 

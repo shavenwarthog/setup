@@ -4,6 +4,8 @@
 ;; basic setup
 (setq inhibit-startup-message t)
 
+(set-variable 'project-dir "~/src/geodelic") ;XXX
+
 (set-foreground-color "white")
 (set-background-color "black")
 
@@ -146,6 +148,7 @@
 
 ;; XXXX:
 ;(require 'project)
+
 (load "~/src/sunlight/project" t)
 (load "~/src/sunlight/cashelper" t)
 (load "~/src/sunlight/jmcompile" t)
@@ -269,7 +272,7 @@ class or function."
 (define-key python-mode-map [kp-add] 		'jmc-nose-file)
 (define-key python-mode-map [C-kp-add] 		'jmc-nose-tree)
 
-(define-key python-mode-map [kp-home]		'jmc-py-copyarg)
+;; (define-key python-mode-map [kp-home]		'jmc-py-copyarg)
 
 (define-key python-mode-map [kp-delete] 	'jmc-pdb)
 (define-key python-mode-map [C-kp-delete] 	'jmc-pdb-setfunc)
@@ -314,6 +317,10 @@ class or function."
 ;; 	   ;; bling on laptop:
 ;; 	   85))
 
+;; tartigrade-tv:
+(when (string= system-name "tartigrade")
+  (set-face-attribute  'default nil  :height 120))
+
 (when nil
   (require 'color-theme)
   ;; (color-theme-gnome2)
@@ -351,7 +358,7 @@ class or function."
   ;; If you edit it by hand, you could mess it up, so be careful.
   ;; Your init file should contain only one such instance.
   ;; If there is more than one, they won't work right.
- )
+ '(safe-local-variable-values (quote ((pymacs-auto-reload . t)))))
 
 ;; elpowers:
 (custom-set-faces

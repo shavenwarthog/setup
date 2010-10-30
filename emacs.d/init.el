@@ -4,7 +4,7 @@
 ;; basic setup
 (setq inhibit-startup-message t)
 
-(set-variable 'project-dir "~/src/geodelic") ;XXX
+(set-variable 'project-dir "~/src/xx") ;XXX
 
 (set-foreground-color "white")
 (set-background-color "black")
@@ -86,11 +86,15 @@
   (autoload 'turn-on-eldoc-mode "eldoc" nil t)
   (add-hook 'emacs-lisp-mode-hook 'turn-on-eldoc-mode)
   (add-hook 'lisp-interaction-mode-hook 'turn-on-eldoc-mode)
-  (add-hook 'python-mode-hook 'turn-on-eldoc-mode))
+  ;; (add-hook 'python-mode-hook 'turn-on-eldoc-mode)
+  )
 
 
 ;; :::::::::::::::::::::::::::::::::::::::::::::::::: MISC MINOR
 
+(when t
+  (setq which-func-modes t)
+  (which-func-mode 1))
 (when nil
   (global-set-key (kbd "C-<tab>") 'dabbrev-expand)
   (define-key minibuffer-local-map (kbd "C-<tab>") 'dabbrev-expand))
@@ -100,14 +104,7 @@
   (setq ido-enable-flex-matching t)) ;; enable fuzzy matching
   
 
-(put 'suspend-frame 'disabled t)	; zap C-z
 
-; https://bugs.launchpad.net/python-mode/+bug/505295
-(require 'python)
-(setq py-pdbtrack-stack-entry-regexp
-      "^> \\(.*\\)(\\([0-9]+\\))\\([?a-zA-Z0-9_<>]+\\)()")
-
-(add-to-list 'auto-mode-alist '("\\.egg\\'" . archive-mode))
 
 ;; M-s h p = highlight-phrase
 (require 'hi-lock)
@@ -142,6 +139,11 @@
 ;; :::::::::::::::::::::::::::::::::::::::::::::::::: PYTHON
 
 (require 'python)
+; https://bugs.launchpad.net/python-mode/+bug/505295
+(setq py-pdbtrack-stack-entry-regexp
+      "^> \\(.*\\)(\\([0-9]+\\))\\([?a-zA-Z0-9_<>]+\\)()")
+
+(add-to-list 'auto-mode-alist '("\\.egg\\'" . archive-mode))
 
 
 ;; :::::::::::::::::::::::::::::::::::::::::::::::::: SUNLIGHT
@@ -318,7 +320,7 @@ class or function."
 ;; 	   85))
 
 ;; tartigrade-tv:
-(when (string= system-name "tartigrade")
+(when (string= system-name "tartigrade.lan9") ;XX
   (set-face-attribute  'default nil  :height 120))
 
 (when nil
@@ -369,7 +371,7 @@ class or function."
  '(default ((t (:inherit nil :stipple nil :background "black" :foreground "white" :inverse-video nil :box nil :strike-through nil :overline nil :underline nil :slant normal :weight normal :height 103 :width normal :foundry "unknown" :family "DejaVu Sans Mono")))))
 
 
-(when (string= system-name "sally")
+(when (string= system-name "tartigrade.lan9") ;XX
   (set-face-attribute 'default nil :height 120))
 
 ;; :::::::::::::::::::::::::::::::::::::::::::::::::: CALENDAR/DIARY
@@ -396,3 +398,5 @@ class or function."
  '("line \\([0-9]+\\)" ;;  character \\([0-9]+\\): \\(.+\\)"
    nil 1))
 ;; "Lint at line 12 character 1: 'window' is not defined."
+
+(put 'suspend-frame 'disabled nil)

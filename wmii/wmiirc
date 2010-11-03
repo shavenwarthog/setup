@@ -14,14 +14,17 @@ WMII_NORMCOLORS='#888888 #222222 #333333'
 WMII_FOCUSCOLORS='#ffffff #285577 #4c7899'
 
 WMII_BACKGROUND='#333333'
-WMII_BACKGROUND_IMAGE='/home/johnm/Pictures/backgrounds-sfw/flickr anita libera corsi.jpg'
 WMII_FONT='fixed'
+
+# sally:
+WMII_BACKGROUND_IMAGE='/home/johnm/Pictures/backgrounds-sfw/flickr anita libera corsi.jpg'
 
 set -- $(echo $WMII_NORMCOLORS $WMII_FOCUSCOLORS)
 WMII_MENU="dmenu -b -fn '$WMII_FONT' -nf '$1' -nb '$2' -sf '$4' -sb '$5'"
 WMII_9MENU="wmii9menu -font '$WMII_FONT' -nf '$1' -nb '$2' -sf '$4' -sb '$5' -br '$6'"
 WMII_TERM="x-terminal-emulator"
 WMII_BROWSER='google-chrome'
+WMII_VIDEO='nautilus ~/Videos/'
 
 # Column Rules
 wmiir write /colrules <<!
@@ -164,6 +167,12 @@ eventstuff() {
 		wmiir xwrite /tag/sel/ctl select up
 	Key $MODKEY-b
 		eval $WMII_BROWSER &
+	Key $MODKEY-v
+		eval $WMII_VIDEO &
+	Key XF86AudioRaiseVolume
+                amixer -q set Master 2dB+ unmute &
+        Key XF86AudioLowerVolume
+                amixer -q set Master 2dB- unmute &
 
 !
 	for i in 0 1 2 3 4 5 6 7 8 9; do
@@ -175,6 +184,12 @@ eventstuff() {
 !
 	done
 }
+
+# Key XF86AudioMute
+# 	amixer -q set Master toggle &>/dev/null &
+# volume bar:
+#	http://shound.org/~semial/codaz/volumebar.pl.txt
+
 
 # WM Configuration
 wmiir write /ctl << EOF

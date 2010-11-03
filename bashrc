@@ -73,8 +73,9 @@ if [ -f ~/.bash_aliases ]; then
 fi
 
 
-# export CDPATH=/usr/share/doc
-export CDPATH=$HOME/src
+# XXXXX:
+# export CDPATH=$HOME/src
+# export PATH=$HOME/local/bin:$PATH
 
 # 
 # enable color support of ls and also add handy aliases
@@ -103,11 +104,10 @@ if [ -f /etc/bash_completion ]; then
 fi
 # export JAVA_HOME=/usr/lib/jvm/java-6-sun
 export HADOOP_HOME=/usr/local/hadoop
-export PATH=$PATH\:$HADOOP_HOME/bin
+# export PATH=$PATH\:$HADOOP_HOME/bin
 export EDITOR=vim
 export MPD_HOST=sally
 
-export PATH=$HOME/local/bin:$PATH
 
 # /usr/share/doc/bash-completion/README.gz
 set show-all-if-ambiguous on
@@ -115,7 +115,7 @@ set visible-stats on
 set page-completions off
 
 
-export PYTHONPATH=$HOME/local/lib/python2.6/site-packages
+# export PYTHONPATH=$HOME/local/lib/python2.6/site-packages
 
 . /etc/bash_completion.d/django_bash_completion
 # compleat

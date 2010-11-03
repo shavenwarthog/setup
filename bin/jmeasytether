@@ -1,0 +1,15 @@
+#!/usr/bin/env python
+
+# Bus 001 Device 011: ID 04e8:681c Samsung Electronics Co., Ltd 
+   # bInterfaceClass         2 Communications
+   #    bInterfaceSubClass      2 Abstract (modem)
+
+import os, subprocess
+
+def notify(summary, body):
+    subprocess.check_call(['notify-send', summary, body])
+
+notify('easytether', 'connecting')
+subprocess.check_call('easytether connect &', shell=True)
+os.system('sudo dhclient easytether0')
+notify('easytether', 'connected')

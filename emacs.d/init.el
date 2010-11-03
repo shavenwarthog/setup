@@ -20,6 +20,17 @@
 (global-set-key [f9] 'jmc-eval-to-here)
 
 
+;; :::::::::::::::::::::::::::::::::::::::::::::::::: VISUALS
+
+(when t
+  ;; ;; tartigrade-tv:
+  ;; (when (string= (system-name) "tartigrade")
+  ;;   (set-face-attribute  'default nil  :height 120))
+  ;; window title is buffer name
+  (setq frame-title-format 
+	(format "@%s %%b - Emacs" system-name))
+  (tool-bar-mode -1))
+
 ;; :::::::::::::::::::::::::::::::::::::::::::::::::: GLOBAL TWEAKS
 
 (desktop-save-mode 1)
@@ -27,39 +38,30 @@
 (add-hook 'after-save-hook
           'executable-make-buffer-file-executable-if-script-p)
 
-;; window title is buffer name
-(setq frame-title-format 
-      (format "@%s %%b - Emacs" system-name))
 
 (put 'downcase-region 'disabled nil)
 (put 'upcase-region 'disabled nil)
-(tool-bar-mode -1)
-(setq py-mode-map (make-sparse-keymap))	; XX fix whine
 
 ;; :::::::::::::::::::::::::::::::::::::::::::::::::: DEVELOPMENT
+
+(setq py-mode-map (make-sparse-keymap))	; XX fix whine
 
 ; rebind complete-symbol (lisp & python) away from M-tab, which the
 ; window manager grabs, to ...
 ;
-(global-set-key '[backtab] 'symbol-complete)
-(define-key emacs-lisp-mode-map '[backtab] 'lisp-complete-symbol)
+(when t
+  (global-set-key '[backtab] 'symbol-complete)
+  (define-key emacs-lisp-mode-map '[backtab] 'lisp-complete-symbol))
 
 ; symbol-complete = ?
 ; complete-symbol = from TAGS
 ; lisp-complete-symbol
 
-(eval-after-load "python"
-  (load "jm-python"))			; fix python-describe-symbol
+(when nil
+  (eval-after-load "python"
+    (load "jm-python")))			; fix python-describe-symbol
 
 
-;; (if (boundp 'makefile-mode-map)
-;;     (define-key makefile-mode-map [kp-enter] 'jmc-make-fast))
-
-; IP 10.x.x.x = work, else=home
-(defun jm-workp ()
-  "at work"
-  (= 10 (elt (car (network-interface-info "eth0")) 0)))
-;; (jm-workp)
 (global-set-key [kp-insert] 'jmc-next)
 
 
@@ -129,7 +131,8 @@
   (global-set-key "\C-ch" 'hide-lines))
 
 
-(when (require 'org-install)
+(when nil
+  (require 'org-install)
   (add-to-list 'auto-mode-alist '("\\.org$" . org-mode))
   (define-key global-map "\C-cl" 'org-store-link)
   (define-key global-map "\C-ca" 'org-agenda)
@@ -151,26 +154,10 @@
 ;; XXXX:
 ;(require 'project)
 
-(load "~/src/sunlight/project" t)
-(load "~/src/sunlight/cashelper" t)
+(load "~/src/sunlight/acheck" t)
+;; (load "~/src/sunlight/cashelper" t)
 (load "~/src/sunlight/jmcompile" t)
 (load "~/src/sunlight/nosetests" t)
-
-
-
-;; :::::::::::::::::::::::::::::::::::::::::::::::::: LUA
-
-(when t
-  (setq auto-mode-alist (cons '("\\.lua$" . lua-mode) auto-mode-alist))
-  (autoload 'lua-mode "lua-mode" "Lua editing mode." t)
-  (add-hook 'lua-mode-hook 'turn-on-font-lock))
-(when nil
-  (require 'lua-mode)
-  (setq lua-mode-map (make-sparse-keymap))
-  (defun jmc-awesome-reload ()
-    (interactive)
-    (jmc-make "awesome -k && killall -HUP awesome"))
-  (define-key lua-mode-map [kp-enter] 'jmc-awesome-reload))
 
 
 
@@ -228,13 +215,6 @@ class or function."
 ;; tag-word-match-p tag-partial-file-name-match-p tag-any-match-p)
 
 
-;; :::::::::::::::::::::::::::::::::::::::::::::::::: FLYNOTE
-;; (eval-after-load "edebug" '(def-edebug-spec c-point t))
-
-(when t
-  (unless (file-exists-p "flynote.el")
-    (add-to-list 'load-path "~/src/flynote1/"))
-  (require 'flynote nil t))
 
 
 ;; :::::::::::::::::::::::::::::::::::::::::::::::::: KEYS
@@ -285,6 +265,15 @@ class or function."
   (define-key python-mode-map (kbd "C-<down>") 	'python-end-of-block)
   (define-key python-mode-map (kbd "C-<up>") 	'python-beginning-of-block))
 
+(defun jmc-eval-and-retest ()
+  (interactive)
+  (eval-defun nil)
+  (jmc-retest))
+(defalias 'jmc-retest 'jmc-make-recompile)
+(define-key emacs-lisp-mode-map (kbd "<kp-enter>") 	'jmc-eval-and-retest)
+; (global-set-key (kbd "<kp-enter>") 	'jmc-retest)
+
+(define-key emacs-lisp-mode-map (kbd "<kp-add>") 'elint-current-buffer)
 
 
 ;; :::::::::::::::::::::::::::::::::::::::::::::::::: WEIRD KEYS
@@ -293,65 +282,11 @@ class or function."
 ;; side up/down = 9/8
 ;; thumb = 10
 
-;; Toshiba:
-;; play/pause, prev, next, mute
-;; volume=XF86AudioRaiseVolume
-
 ; later: control +/- = larger/smaller font, control 0 = default
 ; (X: ^0 is already bound)
 
 
-;; :::::::::::::::::::::::::::::::::::::::::::::::::: THEMES (unused)
 
-;; Change to dark colors
-(defun elpowers-theme ()
-  (interactive)
-  (set-cursor-color "red")
-  (set-foreground-color "white")
-  (set-background-color "black")
-  (set-face-foreground 'font-lock-function-name-face "orange"))
-
-;; (set-face-attribute 
-;;  'default nil 
-;;  :height (if (jm-workp)
-;; 	     ;; bling on TV: 
-;; 	     85
-;; 	   ;; bling on laptop:
-;; 	   85))
-
-;; tartigrade-tv:
-(when (string= system-name "tartigrade.lan9") ;XX
-  (set-face-attribute  'default nil  :height 120))
-
-(when nil
-  (require 'color-theme)
-  ;; (color-theme-gnome2)
-  ;; (set-face-font 'menu "7x14")
-  (defun jm-theme-fix ()
-    (interactive)
-    (set-face-attribute  'default nil  :height 85))
-  (defun jm-theme-install-at-point ()
-    (interactive)
-    (let ((themename (thing-at-point 'symbol)))
-      (funcall (car (read-from-string themename)))
-      (jm-theme-fix))))
-
-;; (setq 'jm-themes
-;;       (list
-;;        (color-theme-lethe "Lethe" "Ivica Loncar <ivica.loncar@srk.fer.hr>")
-;;        (color-theme-dark-laptop "Dark Laptop" "Laurent Michel <ldm@cs.brown.edu>")
-;;        '(color-theme-ld-dark "Linh Dang Dark" "Linh Dang <linhd@nortelnetworks.com>")))
-;;        (color-theme-taylor "Taylor" "Art Taylor <reeses@hemisphere.org>")
-;;        (color-theme-taming-mr-arneson "Taming Mr Arneson" "Erik Arneson <erik@aarg.net>")
-;;        (color-theme-charcoal-black "Charcoal Black" "Lars Chr. Hausmann <jazz@zqz.dk>")
-;;        (color-theme-euphoria "Euphoria" "oGLOWo@oGLOWo.cjb.net")
-;;        (color-theme-late-night "Late Night" "Alex Schroeder <alex@gnu.org>")
-;;        (color-theme-matrix "Matrix" "Walter Higgins <walterh@rocketmail.com>")
-;;        (color-theme-midnight "Midnight" "Gordon Messmer <gordon@dragonsdawn.net>")
-;;        (color-theme-robin-hood "Robin Hood" "Alex Schroeder <alex@gnu.org>")
-;;        (color-theme-subtle-hacker "Subtle Hacker" "Colin Walters <levanti@verbum.org>")
-;;        (color-theme-tty-dark "TTY Dark" "O Polite <m2@plusseven.com>")
-;;        ))
 
 ;; :::::::::::::::::::::::::::::::::::::::::::::::::: CUSTOMIZATION
 
@@ -368,11 +303,11 @@ class or function."
   ;; If you edit it by hand, you could mess it up, so be careful.
   ;; Your init file should contain only one such instance.
   ;; If there is more than one, they won't work right.
- '(default ((t (:inherit nil :stipple nil :background "black" :foreground "white" :inverse-video nil :box nil :strike-through nil :overline nil :underline nil :slant normal :weight normal :height 103 :width normal :foundry "unknown" :family "DejaVu Sans Mono")))))
+ '(default ((t (:inherit nil :stipple nil :background "black" :foreground "white" :inverse-video nil :box nil :strike-through nil :overline nil :underline nil :slant normal :weight normal :height 120 :width normal :foundry "unknown" :family "DejaVu Sans Mono")))))
 
 
-(when (string= system-name "tartigrade.lan9") ;XX
-  (set-face-attribute 'default nil :height 120))
+;; (when (string= (system-name) "tartigrade") ;XX
+;;   (set-face-attribute 'default nil :height 120))
 
 ;; :::::::::::::::::::::::::::::::::::::::::::::::::: CALENDAR/DIARY
 
@@ -383,14 +318,6 @@ class or function."
   (add-hook 'diary-display-hook 'fancy-diary-display)
   (add-hook 'today-visible-calendar-hook 'calendar-mark-today))
 
-                         
-;; (REGEXP FILE [LINE COLUMN TYPE HYPERLINK HIGHLIGHT...]).
-(when nil
-  (push '(tie-compiler
-	  "^File: \\([^,]+\\), Line: \\([0-9]+\\), \\(?:\\(Error\\)\\|\\(Warning\\)\\|\\(Message\\)\\): (\\(.+\\)),"
-	  1 2 nil (4 . 5))
-        compilation-error-regexp-alist-alist)
-  (push  'tie-compiler compilation-error-regexp-alist))
 
 
 (add-to-list 
@@ -400,3 +327,9 @@ class or function."
 ;; "Lint at line 12 character 1: 'window' is not defined."
 
 (put 'suspend-frame 'disabled nil)
+
+
+
+;;; Emacs/W3 Configuration
+(setq load-path (cons "/home/johnm/local/share/emacs/site-lisp" load-path))
+(condition-case () (require 'w3-auto "w3-auto") (error nil))

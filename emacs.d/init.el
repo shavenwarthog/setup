@@ -4,7 +4,7 @@
 ;; basic setup
 (setq inhibit-startup-message t)
 
-(set-variable 'project-dir "~/src/xx") ;XXX
+(set-variable 'project-dir "~/src/geodelic/") ;XXX
 
 (set-foreground-color "white")
 (set-background-color "black")
@@ -242,7 +242,8 @@ class or function."
 (global-set-key (kbd "C-x g") 'grep)
 (global-set-key (kbd "C-x m") 'manual-entry)
 
-(global-set-key [kp-delete] 'jmc-pdb-thisfunc)
+;; (global-set-key [kp-delete] 'jmc-pdb-thisfunc)
+  
 (global-set-key [kp-enter] 'jmc-make-recompile)
 (global-set-key [kp-add]   'jmc-nose-tree)
 (global-set-key [kp-subtract] 'flynote-pylint-disable-msg)
@@ -261,19 +262,29 @@ class or function."
 (define-key python-mode-map (kbd "S-<kp-decimal>") 	'jmc-pdb-toggle)
 (define-key python-mode-map (kbd "S-<kp-delete>") 	'jmc-pdb-toggle)
 
+(when (featurep 'acheck)
+  (define-key python-mode-map (kbd "<kp-delete>") 'acheck-check))
+(define-key emacs-lisp-mode-map (kbd "<kp-delete>") 'elint-current-buffer)
+  
 (when nil
   (define-key python-mode-map (kbd "C-<down>") 	'python-end-of-block)
   (define-key python-mode-map (kbd "C-<up>") 	'python-beginning-of-block))
 
-(defun jmc-eval-and-retest ()
+
+(defun jmc-eval-and-test ()
   (interactive)
   (eval-defun nil)
-  (jmc-retest))
-(defalias 'jmc-retest 'jmc-make-recompile)
-(define-key emacs-lisp-mode-map (kbd "<kp-enter>") 	'jmc-eval-and-retest)
+  (jmc-test))
+(define-key emacs-lisp-mode-map (kbd "<kp-enter>") 	'jmc-eval-and-test)
+
+(when nil
+  (defun myfunc (beer yum)
+    (+ beer yum))
+  (defun jmc-test () (message "out: %s" (myfunc 1 2))))
+
+
 ; (global-set-key (kbd "<kp-enter>") 	'jmc-retest)
 
-(define-key emacs-lisp-mode-map (kbd "<kp-add>") 'elint-current-buffer)
 
 
 ;; :::::::::::::::::::::::::::::::::::::::::::::::::: WEIRD KEYS

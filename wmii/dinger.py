@@ -1,10 +1,15 @@
 #!/usr/bin/env python2.6
 
 # ./dinger 'bash -c "fortune -o ; sleep 3 ; fortune -o"'
+# dinger --pidof make
 
-import logging, os, sys, time
-from itertools import ifilter
+import logging, optparse, os, sys, time
+from itertools import ifilter, imap
 from optparse import OptionParser
+import procs
+
+import warnings                 # we like os.popen()
+warnings.filterwarnings("ignore")
 
 logging.basicConfig(
     stream=sys.stderr,
@@ -26,42 +31,6 @@ def runme(cmd):
 
 # ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-
-def procs_strace(pids):
-    args = ' '.join( ('-p {0}'.format(pid) for pid in pids) )
-    return os.popen('strace {0}'.format(args))
-
-def proc_info(pid):
-    info = {}
-    for line in open('/proc/%s/status' % pid):
-        key,value = line.split(':')
-        info[key] = value.strip()
-    cmdline_raw = open('/proc/%s/cmdline' % pid).read()
-    info['cmdline'] = ' '.join(cmdline_raw.split('\0'))
-    return info
-
-def proc_missing(pid, verbose=0):
-    try:
-        os.kill(int(pid), 0)
-        if verbose: print pid,'ok'
-        return False
-    except OSError:
-        if verbose: print pid,'GONE'
-        return True
-
-def proc_children(parent_pid):
-    return set(map(int, os.popen('pgrep -P%s' % parent_pid)))
-
-def proc_vulture(pids):
-    '''wait until a process dies, return its id'''
-    while 1:
-        for pid in pids:
-            if proc_missing(pid):
-                return pid
-        try:
-            time.sleep(1)
-        except KeyboardInterrupt:
-            return None
 
 def make_colordb():
     path = '/etc/X11/rgb.txt'
@@ -165,24 +134,27 @@ def get_children(parent_pid):
         cmd_pids |= proc_children(pid)
     return cmd_pids
 
-def watch_pids(pids):
-    # print 'waiting for %s' % pids
-    # print 'parent: {cmdline}'.format(**proc_info(pids))
-    allinfo = dict( (pid,proc_info(pid)) for pid in pids )
-    # print allinfo
+def watch_pids(pids, verbose=2):
+    if verbose:
+        print 'waiting for %s' % pids
+        # print 'parent: {cmdline}'.format(**procs.proc_info(pids))
+    allinfo = dict( (pid,procs.proc_info(pid)) for pid in pids )
+    if verbose > 1:
+        print allinfo
     print 'watching:'
     for pid in pids:
         print '- {cmdline}'.format(**allinfo[pid])
-    summary = sorted( (info['cmdline'].split()[0]
-                       for info in allinfo.values()) )
+    summary = ' '.join(sorted( (info['cmdline'].split()[0]
+                       for info in allinfo.values()) ))
     bar_write(msg=summary, colors='LightGoldenrod')
 
-    pid_completed = proc_vulture(pids)
+    pid_completed = procs.proc_vulture(pids)
     if not pid_completed:
         return
     cmdline = allinfo[pid_completed]['cmdline']
     print 'completed: %s' % cmdline
-    bar_write(msg=[cmdline], color='DarkGoldenrod') # XXX exit status
+    bar_write(msg=cmdline, colors='DarkGoldenrod') # XXX exit status
+
 
 def lookup_colors(name):
     cols = os.environ.get('WMII_%sCOLORS'%name.upper())
@@ -199,6 +171,27 @@ def bar_write(msg, colors=None):
 
 # ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
+def cmd_watch(options):
+    print options
+    if options.parent_pid:
+        pids = set([int(options.parent_pid)])
+        pids |= get_children(options.parent_pid)
+        pids.discard(os.getpid())
+    elif options.proc_cmd:
+        pipe = os.popen('pidof {0}'.format(options.proc_cmd))
+        pids = set(imap(int, pipe.read().split()))
+        if not pids:
+            print >>sys.stderr, "{0}: no processes found".format(
+                options.proc_cmd)
+            sys.exit(1)
+    if not options.watch_all:
+        watch_pids(pids)
+        return
+    while pids
+
+
+# ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
 def main(args=None):
     # skip if working remotely
     if ':0' not in os.environ.get('DISPLAY',''):
@@ -206,24 +199,22 @@ def main(args=None):
     if args is None:
         args = sys.argv[1:]
 
-    parser = OptionParser()
+    parser = optparse.OptionParser()
     parser.add_option("-P", dest="parent_pid")
+    parser.add_option("--pidof", dest="proc_cmd")
     parser.add_option("--color", dest="color")
 
     (options, args) = parser.parse_args()
-
-    if options.parent_pid:
-        pids = set([int(options.parent_pid)])
-        pids |= get_children(options.parent_pid)
-        pids.discard(os.getpid())
-        watch_pids(pids)
+    print 'beer',options
+    if options.parent_pid or options.proc_cmd:
+        cmd_watch(options)
         return
 
     if not args:
         args = ['norm']
     if args[0] in set(WM_COLORS)|set(COLORDB):
         options.color = args.pop(0)
-        bar_write(msg=list(args), color=options.color)
+        bar_write(msg=list(args), colors=options.color)
         return
 
     StatusBar.Create()
@@ -269,4 +260,5 @@ def main(args=None):
     os._exit(0)
 
 if __name__=='__main__':
-    bar_write('beer', 'norm')
+    main(sys.argv[1:])
+

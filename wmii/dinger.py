@@ -6,7 +6,7 @@
 import logging, optparse, os, sys, time
 from itertools import ifilter, imap
 from optparse import OptionParser
-import procs
+from procs import *
 
 import warnings                 # we like os.popen()
 warnings.filterwarnings("ignore")
@@ -137,18 +137,14 @@ def get_children(parent_pid):
 def watch_pids(pids, verbose=2):
     if verbose:
         print 'waiting for %s' % pids
-        # print 'parent: {cmdline}'.format(**procs.proc_info(pids))
-    allinfo = dict( (pid,procs.proc_info(pid)) for pid in pids )
-    if verbose > 1:
-        print allinfo
-    print 'watching:'
-    for pid in pids:
-        print '- {cmdline}'.format(**allinfo[pid])
+    allinfo = dict( (pid,proc_info(pid)) for pid in pids )
+    print 'watching:', ', '.join( 
+        sorted(info['cmdline'] for info in allinfo.values()) )
     summary = ' '.join(sorted( (info['cmdline'].split()[0]
                        for info in allinfo.values()) ))
     bar_write(msg=summary, colors='LightGoldenrod')
 
-    pid_completed = procs.proc_vulture(pids)
+    pid_completed = proc_vulture(pids)
     if not pid_completed:
         return
     cmdline = allinfo[pid_completed]['cmdline']
@@ -173,21 +169,25 @@ def bar_write(msg, colors=None):
 
 def cmd_watch(options):
     print options
+    watch_all = False
     if options.parent_pid:
         pids = set([int(options.parent_pid)])
         pids |= get_children(options.parent_pid)
         pids.discard(os.getpid())
     elif options.proc_cmd:
+        watch_all = False
         pipe = os.popen('pidof {0}'.format(options.proc_cmd))
         pids = set(imap(int, pipe.read().split()))
         if not pids:
             print >>sys.stderr, "{0}: no processes found".format(
                 options.proc_cmd)
             sys.exit(1)
-    if not options.watch_all:
+    if not watch_all:
         watch_pids(pids)
         return
-    while pids
+    blam
+#     while pids:
+#         done_pid = 
 
 
 # ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::

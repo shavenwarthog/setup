@@ -1,7 +1,7 @@
 # -*- shell-script -*-
 
-alias agi='sudo apt-get install'
-alias acs='apt-cache search'
+alias agi='sudo aptitude install'
+alias acs='aptitude search'
 alias c='git commit -am'
 alias gv='git commit -v'
 alias gva='EDITOR=emacsclient git commit -va'

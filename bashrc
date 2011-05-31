@@ -117,5 +117,5 @@ set page-completions off
 
 # export PYTHONPATH=$HOME/local/lib/python2.6/site-packages
 
-. /etc/bash_completion.d/django_bash_completion
+# . /etc/bash_completion.d/django_bash_completion
 # compleat

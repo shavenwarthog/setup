@@ -245,6 +245,7 @@ class or function."
 ;; (global-set-key [kp-delete] 'jmc-pdb-thisfunc)
   
 (global-set-key [kp-enter] 'jmc-make-recompile)
+(global-set-key (kbd "C-<return>") 'jmc-make-recompile)
 (global-set-key [kp-add]   'jmc-nose-tree)
 (global-set-key [kp-subtract] 'flynote-pylint-disable-msg)
 

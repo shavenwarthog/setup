@@ -1,7 +1,11 @@
 # -*- shell-script -*-
 
+alias ls='ls -CF'
+
 alias agi='sudo aptitude install'
 alias acs='aptitude search'
+
+# :::::::::::::::::::::::::::::::::::::::::::::::::: GIT
 alias c='git commit -am'
 alias gv='git commit -v'
 alias gva='EDITOR=emacsclient git commit -va'

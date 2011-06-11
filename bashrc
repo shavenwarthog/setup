@@ -1,7 +1,11 @@
-# -* shell-script -*-
+# -*- shell-script -*-
 
 # If not running interactively, don't do anything
 [ -z "$PS1" ] && return
+
+# Python/Pip
+export PIP_REQUIRE_VIRTUALENV=true
+export PIP_RESPECT_VIRTUALENV=true
 
 # don't put duplicate lines in the history. See bash(1) for more options
 # don't overwrite GNU Midnight Commander's setting of `ignorespace'.

@@ -1,10 +1,9 @@
-
+;; (load "gnuplot")
 ;; M-x which-function-mode
 
 ;; basic setup
 (setq inhibit-startup-message t)
 
-(set-variable 'project-dir "~/src/geodelic/") ;XXX
 
 (set-foreground-color "white")
 (set-background-color "black")
@@ -156,10 +155,26 @@
 
 (load "~/src/sunlight/acheck" t)
 ;; (load "~/src/sunlight/cashelper" t)
-(load "~/src/sunlight/jmcompile" t)
+
+(when (load "~/src/sunlight/jmcompile2" t)
+  (global-set-key (kbd "C-S-<return>") 'jmc-nose-file))
+
 (load "~/src/sunlight/nosetests" t)
 
+(when (load "~/src/flynote/flynote" t)
+  (flynote-set-pylint))
 
+
+;; :::::::::::::::::::::::::::::::::::::::::::::::::: GNUPLOT
+
+;; (autoload 'gnuplot-mode "gnuplot" nil t)
+(when (load "gnuplot" t)
+  (defun jmc-call-gnuplot-on-buffer ()
+    (interactive)
+    (save-some-buffers t)
+    (call-gnuplot-on-buffer))
+  (add-to-list 'auto-mode-alist '("\\.plt$" . gnuplot-mode))
+  (define-key gnuplot-mode-map (kbd "C-c") 'jmc-call-gnuplot-on-buffer))
 
 
 ;; :::::::::::::::::::::::::::::::::::::::::::::::::: PDB
@@ -243,8 +258,18 @@ class or function."
 (global-set-key (kbd "C-x m") 'manual-entry)
 
 ;; (global-set-key [kp-delete] 'jmc-pdb-thisfunc)
+
+(setq compilation-ask-about-save nil)
+(defun jmc-recompile ()
+  (interactive)
+  ;; (catch 'marker (kill-compilation))
+  (recompile))
   
+(global-set-key (kbd "S-<return>") 'flynote-check)
+(global-set-key (kbd "<C-S-return>") 'jmc-nose-test-file)
+
 (global-set-key [kp-enter] 'jmc-make-recompile)
+(global-set-key (kbd "<C-return>") 'jmc-recompile)
 (global-set-key [kp-add]   'jmc-nose-tree)
 (global-set-key [kp-subtract] 'flynote-pylint-disable-msg)
 
@@ -306,7 +331,7 @@ class or function."
   ;; If you edit it by hand, you could mess it up, so be careful.
   ;; Your init file should contain only one such instance.
   ;; If there is more than one, they won't work right.
- '(safe-local-variable-values (quote ((pymacs-auto-reload . t)))))
+ '(safe-local-variable-values (quote ((test-case-name . twisted\.test\.test_log) (pymacs-auto-reload . t)))))
 
 ;; elpowers:
 (custom-set-faces
@@ -344,3 +369,5 @@ class or function."
 ;;; Emacs/W3 Configuration
 (setq load-path (cons "/home/johnm/local/share/emacs/site-lisp" load-path))
 (condition-case () (require 'w3-auto "w3-auto") (error nil))
+
+(require 'sendgrid)

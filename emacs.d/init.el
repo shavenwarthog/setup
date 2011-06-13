@@ -150,9 +150,6 @@
 
 ;; :::::::::::::::::::::::::::::::::::::::::::::::::: SUNLIGHT
 
-;; XXXX:
-;(require 'project)
-
 (load "~/src/sunlight/acheck" t)
 ;; (load "~/src/sunlight/cashelper" t)
 
@@ -269,13 +266,15 @@ class or function."
 (global-set-key (kbd "<C-S-return>") 'jmc-nose-test-file)
 
 (global-set-key [kp-enter] 'jmc-make-recompile)
-(global-set-key (kbd "<C-return>") 'jmc-recompile)
+;; (global-set-key (kbd "<C-return>") 'jmc-recompile)
+(global-set-key (kbd "C-<return>") 'jmc-make-recompile)
 (global-set-key [kp-add]   'jmc-nose-tree)
 (global-set-key [kp-subtract] 'flynote-pylint-disable-msg)
 
 (define-key python-mode-map (kbd "C-h f")	'python-describe-symbol)
 
-(define-key python-mode-map [kp-enter] 		'jmc-make-recompile)
+(define-key python-mode-map (kbd "C-<return>") 'flynote-check)
+(define-key python-mode-map (kbd "C-S-<return>") 'jmc-nose-test-function)
 (define-key python-mode-map [C-kp-enter] 	'jmc-nose-thisfunc)
 (define-key python-mode-map [kp-add] 		'jmc-nose-file)
 (define-key python-mode-map [C-kp-add] 		'jmc-nose-tree)
@@ -343,7 +342,7 @@ class or function."
 
 
 ;; (when (string= (system-name) "tartigrade") ;XX
-;;   (set-face-attribute 'default nil :height 120))
+;;   (set-face-attribute 'default nil :height 140)
 
 ;; :::::::::::::::::::::::::::::::::::::::::::::::::: CALENDAR/DIARY
 

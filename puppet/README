@@ -1,0 +1,16 @@
+http://plathrop.tertiusfamily.net/puppet/best-practice-draft.html
+
+http://blog.manjusri.org/2009/11/19/puppet-for-absolute-beginners/
+
+http://projects.puppetlabs.com/projects/1/wiki/Advanced_Puppet_Pattern
+
+
+puppet apply -e 'file { "/tmp/adhoc": content => "Written from puppet\n", mode => 640 }'
+
+http://www.puppetcookbook.com/posts/simple-adhoc-execution-with-apply-execute.html
+
+http://semicomplete.com/presentations/puppet-at-loggly/puppet-at-loggly.pdf.html
+
+
+Google Chrome
+deb http://dl.google.com/linux/deb/ stable main

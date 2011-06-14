@@ -94,6 +94,9 @@
 ;; :::::::::::::::::::::::::::::::::::::::::::::::::: MISC MINOR
 
 (when t
+  (add-to-list 'auto-mode-alist '("\\.pp$" . puppet-mode)))
+
+(when t
   (setq which-func-modes t)
   (which-func-mode 1))
 (when nil
@@ -159,10 +162,10 @@
 (load "~/src/sunlight/nosetests" t)
 
 
-(when (load "~/src/flynote/flynote" t)
-  (add-to-list 'flynote-load-path "~/src/flynote") ; XX
-  (add-hook 'python-mode-hook
-	    (lambda () (flynote-mode))))
+;; (when (load "~/src/flynote/flynote" t)
+;;   (add-to-list 'flynote-load-path "~/src/flynote") ; XX
+;;   (add-hook 'python-mode-hook
+;; 	    (lambda () (flynote-mode))))
   ;; (flynote-set-pylint))
 
 

@@ -156,8 +156,11 @@
 (load "~/src/sunlight/jmcompile" t)
 (load "~/src/sunlight/nosetests" t)
 
-;; (when (load "~/src/flynote/flynote" t)
-;;   (add-to-list 'flynote-load-path "~/src/flynote"))
+
+(when (load "~/src/flynote/flynote" t)
+  (add-to-list 'flynote-load-path "~/src/flynote") ; XX
+  (add-hook 'python-mode-hook
+	    (lambda () (flynote-mode))))
 
 
 

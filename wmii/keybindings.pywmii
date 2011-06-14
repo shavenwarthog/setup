@@ -1,0 +1,228 @@
+#@+leo-ver=4
+#@+node:@file keybindings.pywmii
+# keybindings.pywmii
+#
+# set up some key bindings
+
+#@+others
+#@+node:focus
+# focus to windows above, below, left, right
+Mod4-h = wmii.focusLeft
+Mod4-j = wmii.focusDown
+Mod4-k = wmii.focusUp
+Mod4-l = wmii.focusRight
+
+# and the old familiar alt-tab
+Mod1-Tab = wmii.view.focusNext
+Mod1-Shift-Tab = wmii.view.focusPrev
+
+#@-node:focus
+#@+node:move within view
+# move current window up, down, left, right
+Mod4-Shift-h = wmii.sel.moveToLeft
+Mod4-Shift-j = wmii.sel.moveBelow
+Mod4-Shift-k = wmii.sel.moveAbove
+Mod4-Shift-l = wmii.sel.moveToRight
+
+#@-node:move within view
+#@+node:close/kill
+# close current window
+Mod4-Shift-c = wmii.sel.kill
+
+#@-node:close/kill
+#@+node:misc
+# with these two bindings, we pass a string, which will
+# be executed as a shell command
+Mod4-Return = "gnome-terminal"
+# Mod4-Shift-Return = "gnome-terminal"
+Mod4-b = "google-chrome"
+
+# Mod4-slash = "/home/david/work/bin/leo code.leo"
+
+#@-node:misc
+#@+node:views
+Mod4-1 = wmii.gotoTag, 1
+Mod4-2 = wmii.gotoTag, 2
+Mod4-3 = wmii.gotoTag, 3
+Mod4-4 = wmii.gotoTag, 4
+Mod4-5 = wmii.gotoTag, 5
+Mod4-6 = wmii.gotoTag, 6
+Mod4-7 = wmii.gotoTag, 7
+Mod4-8 = wmii.gotoTag, 8
+Mod4-9 = wmii.gotoTag, 9
+
+Mod4-Shift-1 = wmii.sel.moveToTag, 1
+Mod4-Shift-2 = wmii.sel.moveToTag, 2
+Mod4-Shift-3 = wmii.sel.moveToTag, 3
+Mod4-Shift-4 = wmii.sel.moveToTag, 4
+Mod4-Shift-5 = wmii.sel.moveToTag, 5
+Mod4-Shift-6 = wmii.sel.moveToTag, 6
+Mod4-Shift-7 = wmii.sel.moveToTag, 7
+Mod4-Shift-8 = wmii.sel.moveToTag, 8
+Mod4-Shift-9 = wmii.sel.moveToTag, 9
+
+
+# switch to previous/next view
+Mod4-Control-h = wmii.gotoPrevTag
+Mod4-Control-l = wmii.gotoNextTag
+
+# and a couple of synonyms, which use the right-arrow key
+Mod4-Right = wmii.gotoNextTag
+Mod4-Left = wmii.gotoPrevTag
+
+# and yet more synonyms
+Mod4-Tab = wmii.gotoNextTag
+Mod4-Shift-Tab = wmii.gotoPrevTag
+
+# move current window to prev/next view, and switch
+# to that view
+Mod4-Shift-Control-h = wmii.sel.moveToPrevTag, True
+Mod4-Shift-Control-l = wmii.sel.moveToNextTag, True
+
+Mod4-Shift-Control-Return = wmii.sel.moveToNewTag, True
+
+# move to a view, according to response to prompt
+Mod4-Shift-slash = wmii.sel.moveToTag
+Mod4-Shift-plus = wmii.sel.addToTag
+Mod4-minus = wmii.sel.delFromTag
+
+#@-node:views
+#@+node:modes
+# change column mode - default, max, stack
+Mod4-d = wmii.colModeDefault
+Mod4-s = wmii.colModeStack
+Mod4-m = wmii.colModeMax
+
+# toggle current window to/from float mode
+Mod4-Shift-space = wmii.sel.floatToggle
+
+# go to/from float mode
+Mod4-space = wmii.float
+Mod4-Mod1-space = wmii.view.floatAll
+Mod4-Control-space = wmii.view.tileAll
+
+#@-node:modes
+#@+node:apps
+Mod4-apostrophe = "pylaunch"
+
+Mod4-g = "gaim"
+
+# other application binds
+Mod4-n = "pan"
+
+Mod4-Shift-z = "gnome-terminal"
+
+#@-node:apps
+#@+node:edit bindings
+Mod4-Control-b = wmii.loadBindings
+#Mod4-Shift-b = "gedit ~/.wmii-3.5/keybindings.pywmii"
+#Mod4-Mod1-Shift-b = "cd ~/work/sw/py/myprogs/pywmii && /home/david/work/bin/leo code.leo"
+Mod4-Shift-b = "cd ~/work/sw/py/myprogs/pywmii && /home/david/work/bin/leo code.leo"
+
+
+#@-node:edit bindings
+#@+node:menus
+# launch programs menu, based on $PATH
+Mod4-p = wmii.progmenu
+
+# launch actions menu, based on executable files with
+# alphanumeric names in user or global wmii directory
+Mod4-a = wmii.actionmenu
+
+#@-node:menus
+#@+node:move/resize
+# the following bindings will only work if you have successfully
+# patched WMII with the 'geometry patch' (see INSTALL). These
+# bindings allow you to dynamically move and resize floating
+# windows
+
+# movement, relative
+Mod1-Mod4-h = wmii.sel.moveRight, -20
+Mod1-Mod4-l = wmii.sel.moveRight, 20
+Mod1-Mod4-j = wmii.sel.moveDown, 20
+Mod1-Mod4-k = wmii.sel.moveDown, -20
+
+# movement, screen corners
+Mod1-Mod4-y = wmii.sel.moveTopLeft
+Mod1-Mod4-u = wmii.sel.moveTopRight
+Mod1-Mod4-b = wmii.sel.moveBottomLeft
+Mod1-Mod4-n = wmii.sel.moveBottomRight
+
+# resizing
+Mod1-Mod4-Control-h = wmii.sel.growRight, -16
+Mod1-Mod4-Control-l = wmii.sel.growRight, 16
+Mod1-Mod4-Control-j = wmii.sel.growDown, 20
+Mod1-Mod4-Control-k = wmii.sel.growDown, -20
+
+# pan mode settings
+Mod1-Mod4-z = wmii.put, panMode, 1
+Mod1-Mod4-Control-z = wmii.put, panMode, 0
+
+Mod1-Mod4-Left = wmii.view.moveFloatClients, 20, 0
+Mod1-Mod4-Right = wmii.view.moveFloatClients, -20, 0
+Mod1-Mod4-Up = wmii.view.moveFloatClients, 0, 20
+Mod1-Mod4-Down = wmii.view.moveFloatClients, 0, -20
+
+Mod1-Mod4-Control-Left = wmii.view.moveFloatClients, 100, 0
+Mod1-Mod4-Control-Right = wmii.view.moveFloatClients, -100, 0
+Mod1-Mod4-Control-Up = wmii.view.moveFloatClients, 0, 100
+Mod1-Mod4-Control-Down = wmii.view.moveFloatClients, 0, -100
+
+Mod1-Mod4-f = wmii.sel.fullscreenToggle
+
+#@-node:move/resize
+#@+node:multimedia keys
+# The following bindings take advantage of the multimedia
+# keys which are present on some keyboards, such as the Genius.
+#
+# NOTE - these require settings in your ~/.Xmodmaprc, such as:
+#
+#   keycode 234 = XF86AudioPrev
+#   keycode 233 = XF86AudioNext
+#
+# to find out the keycodes for your own multimedia keyboard, run xev
+# and press the buttons and note the keycode numbers
+#
+# Don't enable these bindings unless you have the key names defined in
+# your ~/.Xmodmaprc file, or otherwise you may suffer some
+# weird keyboard behaviour that makes your PyWMII environment
+# unusable.
+#
+
+# focus to windows above, below, left, right
+XF86AudioRaiseVolume = wmii.focusLeft
+XF86AudioLowerVolume = wmii.focusRight
+XF86AudioPlay = wmii.focusUp
+XF86AudioStop = wmii.focusDown
+
+# move current window up, down, left, right
+Control-XF86AudioRaiseVolume = wmii.sel.moveAbove
+Control-XF86AudioLowerVolume = wmii.sel.moveBelow
+Control-XF86AudioPlay = wmii.sel.moveToLeft
+Control-XF86AudioStop = wmii.sel.moveToRight
+
+# close current window
+XF86Start = wmii.sel.kill
+
+# quick swapping between views
+# these two are my favourites, much more ergonomic than Mod-KEY combos
+
+XF86AudioPrev = wmii.gotoPrevTag
+XF86AudioNext = wmii.gotoNextTag
+
+# move current window to next/prev tag
+Shift-XF86AudioPlay = wmii.sel.moveToPrevTag, True
+Shift-XF86AudioStop = wmii.sel.moveToNextTag, True
+
+# application launchers
+#XF86Calculator = "xcalc"
+#XF86Calculator = "snac"
+XF86Calculator = "mycalc"
+XF86Mail = "evolution"
+XF86Search = "xchat"
+XF86HomePage = "firefox"
+
+#@-node:multimedia keys
+#@-others
+#@-node:@file keybindings.pywmii
+#@-leo

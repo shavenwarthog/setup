@@ -1,0 +1,278 @@
+#! /usr/bin/env python
+"""
+sample pywmii wmiirc script
+
+Usage: copy this file to ~/.wmii-<version>/wmiirc, chmod it to 744,
+make sure to back up your old wmiirc, then restart wmii
+
+Description:
+    - this is a wmiirc script in python which demonstrates some
+      features of pywmii, such as:
+          - event handling
+          - key binding
+          - object wrapping of WMII and client windows
+          - custom status bar function
+    - it also adds a thread which allows you to switch between
+      views by moving your mouse against the middle of the
+      left or right screen edge.
+"""
+import os
+import time
+import thread
+import commands
+import traceback
+
+from wmii import *
+
+# to add major customisations, such as event handlers, you
+# need to subclass the main WMII class
+
+class MyWMII(WMII):
+    """
+    Subclass WMII to add a couple of event handlers
+
+    So far, it gives only the capability to close a window by
+    middle-clicking on its titlebar, or float it by right-clicking
+    """
+    def on_ClientClick(self, winid, button):
+        """
+        Handle clicks on client titlebars
+        """
+        if button == '2':
+            # middle click - close the client
+            log.info("kill client %s" % winid)
+            self.kill(winid)
+
+        elif button == '3':
+            # right-click - show context menu
+            win = self.clients[winid]
+            if self.sel.column.id == '~':
+                floatOpt = ("Tile Window", win.tile)
+            else:
+                floatOpt = ("Float Window", win.float)
+            choice = self.popupMenu((
+                ("Move To New View", win.moveToNewTag),
+                ("Move to Next View", win.moveToNextTag),
+                ("Move to Previous View", win.moveToPrevTag),
+                ("Move to Right Column", win.moveToRight),
+                ("Move to Left Column", win.moveToLeft),
+                floatOpt,
+                ("Close", win.kill),
+                ))
+            if choice:
+                choice[0](*choice[1:])
+            except:
+                pass
+                traceback.print_exc()
+
+log.info("instantiating WMII subclass")        
+
+# instantiate our WMII object
+wmii = MyWMII()
+
+
+log.info("setting colours")
+
+# set focus bar colors:  text       bkgnd      border
+wmii.focuscolors = ("#000000", "#ffcc00", "#000000")
+wmii.normcolors = ("#ffee44", "#000000", "#000000")
+
+# set the border thickness for floating windows
+wmii.border = 3
+
+# enable click-to-focus mode for floating and column-framed
+# windows
+#wmii.floatclickfocus = 1
+#wmii.colclickfocus = 1
+try:
+    wmii.focusmodel = ('click', 'click')
+except:
+    import traceback
+    traceback.print_exc()
+
+
+
+log.info("setting tag rules")
+
+# Tagging Rules
+wmii.tagrules = [
+    ("/SNAC/", "~"),
+    ("/XMMS.*/", "~"),
+    ("/MPlayer.*/", "~"),
+    ("/.*Untitled.*/", "~"),
+    #("/PyLaunch/", "~"),
+    #("/.*gedit.*/", "~"),
+    #(".*PyLaunch.*", "~"),
+    ("/Send & Receive.*/", "~"),
+    ("/.*Mozilla Firefox.*/", "web"),
+    ("/.*Evolution/", "mail"),
+    ("/XChat.*/", "chat"),
+    ("/.*/", "!"),
+    ("/.*/", "0"),
+    ]
+
+
+log.info("assigning mod key")
+
+# set prefix key - Mod4 = logo key
+wmii.grabmod = "Mod4"
+
+
+# set up some key bindings - these will come
+# from ~/.wmii-<version>/keybindings.pywmii
+
+log.info("loading key bindings")
+
+wmii.loadBindings()
+
+
+log.info("setting up statusbar function")
+
+# declare a function which updates the status bar
+def myStatusFunc(w):
+    load = commands.getoutput("uptime")
+    load = load.split(":")[-1].strip().replace(",","")
+    return load + " | " + time.asctime()
+
+# and set it as statusbar func
+# (in assigning a tuple, we're setting both the function
+# and the delay)
+wmii.statusfunc = myStatusFunc, 2
+
+# now start up status bar and tag bar
+#wmii.statusStart()
+
+
+# if python-xlib is installed, then this code will
+# switch views when the mouse hits the middle of a
+# left/right screen edge
+#
+# based on a 1280x1024 resolution screen
+
+log.info("defining mouse switcher")
+
+def mouseSwitcher():
+
+    wmii.put("panmode", 0)
+
+    try:
+        from Xlib.display import Display
+    except:
+        log.warn("Cannot start mouse view switcher, cannot import Xlib")
+        return
+
+    dpy = Display()
+    screen = dpy.screen()
+    root = screen.root
+
+    xRes = screen.width_in_pixels
+    yRes = screen.height_in_pixels
+
+    yMin = yRes / 2 - 80
+    yMax = yRes / 2 + 80
+
+    # detect mouse at top left of screen
+
+    try:
+        lastSwitch = time.time()
+        switchInterval = 0.5
+        panInterval = 0.05
+        pyLaunchLaunched = False
+
+        while 1:
+            time.sleep(0.05)
+            p = root.query_pointer()
+            x, y = p.root_x, p.root_y
+
+            now = time.time()
+
+            if wmii.get("panMode"):
+                if now - lastSwitch >= panInterval:
+                    if x > 0 and x < xRes-1 and y > 0 and y < yRes-1:
+                        continue # nothing to do
+                    else:
+                        dx = dy = 0
+                        if x == 0:
+                            dx = 32
+                        elif x == xRes-1:
+                            dx = -32
+                        if y == 0:
+                            dy = 32
+                        elif y == yRes-1:
+                            dy = -32
+                    wmii.view.moveFloatClients(dx, dy)
+                    lastSwitch = now
+            else:
+                # regular view swapping mode
+                if now - lastSwitch >= switchInterval:
+                    if y > yMin and y < yMax:
+                        if x == 0:
+                            print "calling prevTag"
+                            wmii.gotoPrevTag()
+                            root.warp_pointer(xRes-20, y)
+                            lastSwitch = now
+                        elif x == xRes-1:
+                            print "calling nextTag"
+                            wmii.gotoNextTag()
+                            root.warp_pointer(20, y)
+                            lastSwitch = now
+
+                if x == 0 and y == 0:
+                    if not pyLaunchLaunched:
+                        os.system('pylaunch &')
+                        pyLaunchLaunched = True
+
+                elif x > 100 and y > 100:
+                    pyLaunchLaunched = False
+
+    except:
+        traceback.print_exc()
+
+log.info("starting mouse switcher")
+
+thread.start_new_thread(mouseSwitcher, ())
+
+log.info("mouse switcher started")
+
+
+def feedTicker():
+    """
+    Subscribes to a news feed, and displays headlines on the status bar
+    """
+    feeds = [
+        ("top", "http://www.stuff.co.nz/feeds/topstories.xml"),
+        ("nat", "http://www.stuff.co.nz/feeds/nationalnews.xml"),
+        ("/.", "http://rss.slashdot.org/Slashdot/slashdot"),
+        ]
+
+    try:
+        import feedparser
+    except:
+        log.error("Cannot import feedparser: disabling news ticker")
+        return
+
+    titleOccurences = {}
+
+    lastTime = time.time()
+    while True:
+        now = time.time()
+        if now - lastTime < 600:
+            time.sleep(now - lastTime)
+        lastTime = now
+        for name, url in feeds:
+            feed = feedparser.parse(url)
+            for story in feed.entries:
+                times = titleOccurences.get(story['title'], 0)
+                if times < 5:
+                    titleOccurences[story['title']] = times + 1
+                    wmii.statusWrite(story['title'][:80], 15)
+                    time.sleep(30)
+
+thread.start_new_thread(feedTicker, ())
+
+
+log.info("starting main loop")
+
+wmii.run()
+
+

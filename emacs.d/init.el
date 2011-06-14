@@ -158,8 +158,12 @@
 
 (load "~/src/sunlight/nosetests" t)
 
+
 (when (load "~/src/flynote/flynote" t)
-  (flynote-set-pylint))
+  (add-to-list 'flynote-load-path "~/src/flynote") ; XX
+  (add-hook 'python-mode-hook
+	    (lambda () (flynote-mode))))
+  ;; (flynote-set-pylint))
 
 
 ;; :::::::::::::::::::::::::::::::::::::::::::::::::: GNUPLOT

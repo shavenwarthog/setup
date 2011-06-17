@@ -165,8 +165,9 @@
 (when (load "~/src/flynote/flynote" t)
   (add-to-list 'flynote-load-path "~/src/flynote") ; XX
   (add-hook 'python-mode-hook
-	    (lambda () (flynote-mode))))
-  (flynote-set-pylint))
+	    (lambda ()
+	      (flynote-mode)
+	      (flynote-set-pylint))))
 
 
 ;; :::::::::::::::::::::::::::::::::::::::::::::::::: GNUPLOT
@@ -282,16 +283,16 @@ class or function."
 
 (define-key python-mode-map (kbd "C-<return>") 'flynote-check)
 (define-key python-mode-map (kbd "C-S-<return>") 'jmc-nose-test-function)
-(define-key python-mode-map [C-kp-enter] 	'jmc-nose-thisfunc)
-(define-key python-mode-map [kp-add] 		'jmc-nose-file)
-(define-key python-mode-map [C-kp-add] 		'jmc-nose-tree)
+;; (define-key python-mode-map [C-kp-enter] 	'jmc-nose-thisfunc)
+;; (define-key python-mode-map [kp-add] 		'jmc-nose-file)
+;; (define-key python-mode-map [C-kp-add] 		'jmc-nose-tree)
 
 ;; (define-key python-mode-map [kp-home]		'jmc-py-copyarg)
 
 (define-key python-mode-map [kp-delete] 	'jmc-pdb)
 (define-key python-mode-map [C-kp-delete] 	'jmc-pdb-setfunc)
-(define-key python-mode-map (kbd "S-<kp-decimal>") 	'jmc-pdb-toggle)
-(define-key python-mode-map (kbd "S-<kp-delete>") 	'jmc-pdb-toggle)
+;; (define-key python-mode-map (kbd "S-<kp-decimal>") 	'jmc-pdb-toggle)
+;; (define-key python-mode-map (kbd "S-<kp-delete>") 	'jmc-pdb-toggle)
 
 (when (featurep 'acheck)
   (define-key python-mode-map (kbd "<kp-delete>") 'acheck-check))

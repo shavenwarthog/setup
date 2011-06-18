@@ -77,6 +77,32 @@
   (setq truncate-partial-width-windows nil))
 (add-hook 'compilation-mode-hook 'jm-compilation-mode-hook)
 
+;; (defun jm-compilation-hi-lock ()
+;;   (hi-lock-
+
+;; :::::::::::::::::::::::::::::::::::::::::::::::::: HIGLIGHT
+
+(defface hi-dim '((t :foreground "gray40" :background nil)) "dark gray")
+(defface hi-line '((t :foreground "white" :background "gray40")) "horizonal line")
+
+(defface hi-invisible 
+  '((t :foreground "green4" :invisible t 
+       )) "documentation here")
+
+(defface hi-yellow 
+  '((t :foreground "yellow"  :weight bold)) "yellow face")
+
+(defun custcompile-hook ()
+  (interactive)
+  (hi-lock-set-file-patterns 
+   '(
+     ("^make.+" (0 'hi-line t))
+     ;; yellow boxy
+     ("w_post[0-9]*" (0 'hi-yellow t))
+     ;; dim dates
+     ("^[0-9][0-9-:, ]\\{9,\\}+[0-9]" (0 'hi-dim t))
+     )))
+(add-hook 'compilation-mode-hook 'custcompile-hook)
 
 
 
@@ -153,7 +179,10 @@
 
 ;; :::::::::::::::::::::::::::::::::::::::::::::::::: SUNLIGHT
 
-(load "~/src/sunlight/acheck" t)
+;; XX fun!
+(when nil
+  (load "~/src/sunlight/acheck" t))
+
 ;; (load "~/src/sunlight/cashelper" t)
 
 (when (load "~/src/sunlight/jmcompile2" t)

@@ -52,18 +52,6 @@
   (global-set-key '[backtab] 'symbol-complete)
   (define-key emacs-lisp-mode-map '[backtab] 'lisp-complete-symbol))
 
-; symbol-complete = ?
-; complete-symbol = from TAGS
-; lisp-complete-symbol
-
-(when nil
-  (eval-after-load "python"
-    (load "jm-python")))			; fix python-describe-symbol
-
-
-(global-set-key [kp-insert] 'jmc-next)
-
-
 
 ;; :::::::::::::::::::::::::::::::::::::::::::::::::: COMPILE MODE
 
@@ -77,10 +65,8 @@
   (setq truncate-partial-width-windows nil))
 (add-hook 'compilation-mode-hook 'jm-compilation-mode-hook)
 
-;; (defun jm-compilation-hi-lock ()
-;;   (hi-lock-
 
-;; :::::::::::::::::::::::::::::::::::::::::::::::::: HIGLIGHT
+;; :::::::::::::::::::::::::::::::::::::::::::::::::: HIGHLIGHT
 
 (defface hi-dim '((t :foreground "gray40" :background nil)) "dark gray")
 (defface hi-line '((t :foreground "white" :background "gray40")) "horizonal line")
@@ -99,10 +85,20 @@
      ("^make.+" (0 'hi-line t))
      ;; yellow boxy
      ("w_post[0-9]*" (0 'hi-yellow t))
+     ("loop" (0 'hi-yellow t))
      ;; dim dates
      ("^[0-9][0-9-:, ]\\{9,\\}+[0-9]" (0 'hi-dim t))
      )))
 (add-hook 'compilation-mode-hook 'custcompile-hook)
+
+(when nil
+  (require 'trimfat)
+  (add-hook 'compilation-mode-hook 'trimfat-mode-hook)
+  (setq trimfat-flush-lines-regexp-list
+	(list "File .+/site-packages/.+\n")))
+	
+
+
 
 
 
@@ -183,13 +179,11 @@
 (when nil
   (load "~/src/sunlight/acheck" t))
 
-;; (load "~/src/sunlight/cashelper" t)
-
 (when (load "~/src/sunlight/jmcompile2" t)
-  (global-set-key (kbd "C-S-<return>") 'jmc-nose-file))
+  ;; (global-set-key (kbd "C-S-<return>") 'jmc-test-something)
+  )
 
-(load "~/src/sunlight/nosetests" t)
-
+;; (load "~/src/sunlight/nosetests" t)
 
 (when (load "~/src/flynote/flynote" t)
   (add-to-list 'flynote-load-path "~/src/flynote") ; XX
@@ -208,7 +202,8 @@
     (save-some-buffers t)
     (call-gnuplot-on-buffer))
   (add-to-list 'auto-mode-alist '("\\.plt$" . gnuplot-mode))
-  (define-key gnuplot-mode-map (kbd "C-c") 'jmc-call-gnuplot-on-buffer))
+  (define-key gnuplot-mode-map (kbd "C-c") 'jmc-call-gnuplot-on-buffer)
+  (define-key gnuplot-mode-map (kbd "C-S-<return>") 'jmc-call-gnuplot-on-buffer))
 
 
 ;; :::::::::::::::::::::::::::::::::::::::::::::::::: PDB
@@ -224,45 +219,6 @@
 	    "Set temporary breakpoint at current line.")
    (gud-def gud-remove "clear %d%f:%l" "\C-d" 
 	    "Remove breakpoint at current line")))
-
-
-;; :::::::::::::::::::::::::::::::::::::::::::::::::: TAGS
-
-;; M-.  find tag under cursor, where tag is a *symbol*
-;; M-,  find next matching *symbol*
-;;
-
-(setq tags-revert-without-query t
-      tags-case-fold-search nil)
-
-;; (tags-search "^def search(")
-;; (tags-apropos "search")
-(global-set-key (kbd "M-?") 'tags-apropos)
-
-(defun tag-py-outer-match-p (tag)
-  "Return non-nil if TAG defined at outer level of Python source;
-class or function."
-  (tag-re-match-p (format "^def %s(" tag)))
-
-(defun jmc-set-match-order ()
-  (interactive)
-  (setq find-tag-tag-order .
-	(;; tag-py-outer-match-p
-	 ;; tag-exact-file-name-match-p
-	 ; tag-file-name-match-p
-	 ;; tag-exact-match-p
-	 ;; tag-implicit-name-match-p
-	 'tag-symbol-match-p
-	 ;; tag-word-match-p
-	 ;; tag-partial-file-name-match-p
-	 ;; tag-any-match-p
-	 )))
-
-;; find-tag-tag-order is a variable defined in `etags.el'.
-;; (tag-exact-file-name-match-p tag-file-name-match-p
-;; tag-exact-match-p tag-implicit-name-match-p tag-symbol-match-p
-;; tag-word-match-p tag-partial-file-name-match-p tag-any-match-p)
-
 
 
 
@@ -300,7 +256,6 @@ class or function."
   (recompile))
   
 (global-set-key (kbd "S-<return>") 'flynote-check)
-(global-set-key (kbd "<C-S-return>") 'jmc-nose-test-file)
 
 (global-set-key [kp-enter] 'jmc-make-recompile)
 ;; (global-set-key (kbd "<C-return>") 'jmc-recompile)
@@ -308,10 +263,12 @@ class or function."
 (global-set-key [kp-add]   'jmc-nose-tree)
 (global-set-key [kp-subtract] 'flynote-pylint-disable-msg)
 
-(define-key python-mode-map (kbd "C-h f")	'python-describe-symbol)
+;; (define-key python-mode-map (kbd "C-h f")	'python-describe-symbol)
 
 (define-key python-mode-map (kbd "C-<return>") 'flynote-check)
-(define-key python-mode-map (kbd "C-S-<return>") 'jmc-nose-test-function)
+(define-key python-mode-map (kbd "C-S-<return>") 'jmc-test-something)
+;; (global-set-key (kbd "<C-S-return>") 'jmc-nose-test-file)
+
 ;; (define-key python-mode-map [C-kp-enter] 	'jmc-nose-thisfunc)
 ;; (define-key python-mode-map [kp-add] 		'jmc-nose-file)
 ;; (define-key python-mode-map [C-kp-add] 		'jmc-nose-tree)
@@ -322,6 +279,8 @@ class or function."
 (define-key python-mode-map [C-kp-delete] 	'jmc-pdb-setfunc)
 ;; (define-key python-mode-map (kbd "S-<kp-decimal>") 	'jmc-pdb-toggle)
 ;; (define-key python-mode-map (kbd "S-<kp-delete>") 	'jmc-pdb-toggle)
+
+(add-hook 'python-mode-hook 'turn-on-eldoc-mode)
 
 (when (featurep 'acheck)
   (define-key python-mode-map (kbd "<kp-delete>") 'acheck-check))
@@ -407,3 +366,18 @@ class or function."
 (condition-case () (require 'w3-auto "w3-auto") (error nil))
 
 (require 'sendgrid)
+
+
+
+
+
+(global-set-key (kbd "M-/") 'hippie-expand)
+
+;; (setq hippie-expand-try-functions-list '(try-expand-dabbrev
+;; try-expand-dabbrev-all-buffers try-expand-dabbrev-from-kill
+;; try-complete-file-name-partially try-complete-file-name
+;; try-expand-all-abbrevs try-expand-list try-expand-line
+;; try-complete-lisp-symbol-partially try-complete-lisp-symbol))
+
+
+  

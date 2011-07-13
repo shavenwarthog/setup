@@ -2,7 +2,6 @@
 
 node basenode {
   package {
-# X: Ubuntu package names:
     ["apache2", "curl", 'git', 'emacs',
      'gnuplot', 'evince', 'fortunes-off',
      'sshfs', 'pylint', 'man2html',
@@ -10,6 +9,9 @@ node basenode {
 'libzmq-dev',
 'pymacs',
 'pyflakes',
+'exuberant-ctags',
+
+     'vim',
      ]:
       ensure => installed;
   }

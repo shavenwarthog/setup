@@ -37,7 +37,7 @@ icon: /usr/share/icons/skype.png
 # mustache!
 icon: /usr/share/skype/avatars/Skypers of the Caribbean.png
 # icon = 'dialog-warning'
-alert_words: ('@all', '@john', '@johnm')
+alert_words: @all @john @johnm
 '''
 
 # ::::::::::::::::::::::::::::::::::::::::::::::::::

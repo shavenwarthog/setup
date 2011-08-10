@@ -4,7 +4,7 @@
 
 ;; :::::::::::::::::::::::::::::::::::::::::::::::::: TWEAKS
 
-(desktop-save-mode 1)
+;; (desktop-save-mode 1)
 
 (require 'python)
 (add-to-list 'auto-mode-alist '("\\.tac$" . python-mode))

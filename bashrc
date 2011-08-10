@@ -6,12 +6,13 @@
 # If not running interactively, don't do anything
 [ -z "$PS1" ] && return
 
+export GIT_EDITOR=emacsclient
 
 # :::::::::::::::::::::::::::::::::::::::::::::::::: PYTHON
 
 # Python/Pip
 export PIP_REQUIRE_VIRTUALENV=true
-export PIP_RESPECT_VIRTUALENV=true
+# export PIP_RESPECT_VIRTUALENV=true
 
 
 # :::::::::::::::::::::::::::::::::::::::::::::::::: HISTORY

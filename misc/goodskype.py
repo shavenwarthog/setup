@@ -11,7 +11,6 @@ goodskype.py -- pop up message when someone mentions me in Skype
 # 	./goodskype.py -eChatIncoming '-nEcho Test' -mExample@johnm -uecho123
 
 
-
 # ("-e", "--event", dest="type", help="type of SKYPE_EVENT")
 # ("-n", "--sname", dest="sname", help="display-name of contact")
 # ("-u", "--skype", dest="sskype", help="skype-username of contact")
@@ -20,7 +19,7 @@ goodskype.py -- pop up message when someone mentions me in Skype
 # ("-s", "--size", dest="fsize", help="incoming file size")
 # ("-f", "--filename", dest="fname", help="file name", metavar="FILE")
 
-import logging, sys
+import ConfigParser, logging, StringIO, sys
 try:
     import pynotify
 except ImportError:
@@ -31,43 +30,64 @@ if not pynotify.init("Skype Notification"):
     print >>sys.stderr, "init failed" 
     sys.exit(1)
 
-ICON = "/usr/share/icons/skype.png" 
-ICON = '/usr/share/skype/avatars/Skypers of the Caribbean.png' # mustache!
+
+CONFIG = '''
+[default]
+icon: /usr/share/icons/skype.png
+# mustache!
+icon: /usr/share/skype/avatars/Skypers of the Caribbean.png
 # icon = 'dialog-warning'
-ALERT_WORDS = ('@all', '@john', '@johnm', '@backend')
+alert_words: ('@all', '@john', '@johnm')
+'''
+
+# ::::::::::::::::::::::::::::::::::::::::::::::::::
+
 
 logging.basicConfig(
     filename='/tmp/goodskype.log',
     level=logging.INFO,
     )
 
-try:
+def parseconfig(configstr):
+    par = ConfigParser.SafeConfigParser()
+    par.readfp( StringIO.StringIO(configstr) )
+    return dict(par.items('default'))
 
+def notify(conf, argv):
     # parse "-eSkypeLogin" => {'e': 'SkypeLogin'}
     # ignore args not passed in
     msg = dict( (
             (arg[1], arg[2:])
-            for arg in sys.argv[1:]
+            for arg in argv[1:]
             if len(arg) > 2 and arg[2] != '%'
             ) )
     logging.debug('message = %r', msg)
 
     def important(message, alert_words):
-        text = message.get('m','')
+        text = message.get('m','').lower()
         return any( (n in text for n in alert_words) )
 
-    if msg.get('e') != 'ChatIncoming' or not important(msg, ALERT_WORDS):
+    if msg.get('e') != 'ChatIncoming' or not important(msg, conf['alert_words']):
         logging.debug('(not incoming/important)')
         sys.exit(0)
 
-    # {'m': 'afk ~ 15m', 'e': 'ChatIncoming', 'u': 'elms76', 'n': 'Elmer Z @elmer'}
+    # example message:
+    # 	{'m': 'afk ~ 15m', 'e': 'ChatIncoming', 'u': 'elms7',
+    # 	'n': 'Elmer Z @elmer'}
 
     title = msg.get('n') or '?name'
     text  = msg.get('m') or '?msg'
-    notification = pynotify.Notification(title, text, ICON)
-    # notification.set_timeout(pynotify.EXPIRES_NEVER)
+    notification = pynotify.Notification(title, text, conf.get('icon'))
     notification.show()
 
-except Exception:
-    logging.exception('uhoh')
-    
+
+def main():
+    try:
+        notify( parseconfig(CONFIG), sys.argv )
+    except Exception:
+        logging.exception('uhoh')
+        sys.exit(1)
+
+if __name__=='__main__':
+    main()
+

@@ -1,8 +1,14 @@
 (add-to-list 'load-path "~/.emacs.d/")
 (add-to-list 'load-path "~/.emacs.d/internet/")
 
+;; :::::::::::::::::::::::::::::::::::::::::::::::::: PERL
+
+(fset 'perl-mode 'cperl-mode)
+
 
 ;; :::::::::::::::::::::::::::::::::::::::::::::::::: TWEAKS
+
+(server-start)
 
 ;; (desktop-save-mode 1)
 
@@ -74,6 +80,7 @@
 
 
 (global-set-key (kbd "C-<return>") 'jmc-make-recompile)
+; (define-key python-mode-map (kbd "C-S-<return>") 'jmc-test-something)
 (define-key python-mode-map (kbd "C-S-<return>") 'jmc-test-something)
 
 

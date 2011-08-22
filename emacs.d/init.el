@@ -68,7 +68,8 @@
 
 ;; :::::::::::::::::::::::::::::::::::::::::::::::::: EXTERNAL
 
-(load "~/src/sunlight/jmcompile3")
+(load "~/src/sunlight/jmcompile")
+(load "~/src/rudel/rudel-loaddefs.el" t)
 
 ;; :::::::::::::::::::::::::::::::::::::::::::::::::: KEYS
 

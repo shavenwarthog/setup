@@ -37,7 +37,8 @@ icon: /usr/share/icons/skype.png
 # mustache!
 icon: /usr/share/skype/avatars/Skypers of the Caribbean.png
 # icon = 'dialog-warning'
-alert_words: @all @john @johnm
+alert_words: @all @john @johnm @cali
+alert_users: goz
 '''
 
 # ::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -45,7 +46,7 @@ alert_words: @all @john @johnm
 
 logging.basicConfig(
     filename='/tmp/goodskype.log',
-    level=logging.INFO,
+    level=logging.DEBUG,
     )
 
 def parseconfig(configstr):
@@ -61,14 +62,22 @@ def notify(conf, argv):
             for arg in argv[1:]
             if len(arg) > 2 and arg[2] != '%'
             ) )
-    logging.debug('message = %r', msg)
+    alerts = conf['alert_words'].split()
+    users = conf['alert_users'].split()
+    logging.debug('message=%r alert=%r users=%r', msg, alerts, users)
 
     def important(message, alert_words):
         text = message.get('m','').lower()
         return any( (n in text for n in alert_words) )
 
-    if msg.get('e') != 'ChatIncoming' or not important(msg, conf['alert_words']):
-        logging.debug('(not incoming/important)')
+    if msg.get('e') != 'ChatIncoming':
+        logging.debug('(not incoming)')
+        sys.exit(0)
+    if not (
+        msg.get('u') in users
+        or important(msg, alerts)
+        ):
+        logging.debug('(not important)')
         sys.exit(0)
 
     # example message:

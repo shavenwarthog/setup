@@ -7,7 +7,8 @@
 [ -z "$PS1" ] && return
 
 export GIT_EDITOR=emacsclient
-
+export DEBEMAIL="johnlmitchell@gmail.com"
+export DEBFULLNAME="John Mitchell"
 # :::::::::::::::::::::::::::::::::::::::::::::::::: PYTHON
 
 # Python/Pip

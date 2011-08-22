@@ -1,14 +1,28 @@
 (add-to-list 'load-path "~/.emacs.d/")
 (add-to-list 'load-path "~/.emacs.d/internet/")
 
+;; :::::::::::::::::::::::::::::::::::::::::::::::::: KEYS
+
+;; C-x r m		bookmark-set
+;; M-s h r		highlight-regex
+
 ;; :::::::::::::::::::::::::::::::::::::::::::::::::: PERL
 
 (fset 'perl-mode 'cperl-mode)
+(setq
+ cperl-close-paren-offset -1
+ cperl-continued-statement-offset 0
+ cperl-indent-level 2
+ cperl-indent-parens-as-block nil
+ ;; cperl-tabs-always-indent t)
+ )
 
 
 ;; :::::::::::::::::::::::::::::::::::::::::::::::::: TWEAKS
 
-(server-start)
+(which-function-mode)
+
+(server-start t)
 
 ;; (desktop-save-mode 1)
 
@@ -26,8 +40,8 @@
 
 (when (require 'ido)
   (ido-mode t)
-  (setq ido-max-directory-size 1000000)
-  (setq ido-enable-flex-matching t)) ;; enable fuzzy matching
+  (setq ido-max-directory-size 10000
+	ido-enable-flex-matching t)) ;; enable fuzzy matching
 
 ;; :::::::::::::::::::::::::::::::::::::::::::::::::: FLYNOTE
 
@@ -80,8 +94,8 @@
 
 
 (global-set-key (kbd "C-<return>") 'jmc-make-recompile)
-; (define-key python-mode-map (kbd "C-S-<return>") 'jmc-test-something)
-(define-key python-mode-map (kbd "C-S-<return>") 'jmc-test-something)
+;; (define-key python-mode-map (kbd "C-S-<return>") 'jmc-test-something)
+(global-set-key (kbd "C-S-<return>") 'jmc-make-recompile)
 
 
 
@@ -114,3 +128,11 @@
   ;; Your init file should contain only one such instance.
   ;; If there is more than one, they won't work right.
  '(safe-local-variable-values (quote ((test-case-name . twisted\.mail\.test\.test_mail) (test-case-name . twisted\.mail\.test\.test_smtp)))))
+
+
+;; :::::::::::::::::::::::::::::::::::::::::::::::::: TRAMP
+
+(setq tramp-mode t
+      tramp-verbose 4)
+;; (find-file "/dev6-md2.sendgrid.net:work/kamta/Makefile")
+

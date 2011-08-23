@@ -6,6 +6,9 @@
 # If not running interactively, don't do anything
 [ -z "$PS1" ] && return
 
+[ -f "~/work/bashrc" ] && . ~/work/bashrc
+
+
 export GIT_EDITOR=emacsclient
 export DEBEMAIL="johnlmitchell@gmail.com"
 export DEBFULLNAME="John Mitchell"

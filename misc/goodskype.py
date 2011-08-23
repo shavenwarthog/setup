@@ -2,6 +2,12 @@
 
 '''
 goodskype.py -- pop up message when someone mentions me in Skype
+
+INSTALL:
+Skype / Options; Notifications; Advanced View
+enable Execute on Any Event, following in one line:
+	<PATH>/goodskype.py  -e"%type" -n"%sname" -f"%fname"
+	-p"%fpath" -m"%smessage" -s%fsize -u%sskype
 '''
 
 # http://stackp.online.fr/?p=40

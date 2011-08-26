@@ -21,13 +21,10 @@
 ; ;; :::::::::::::::::::::::::::::::::::::::::::::::::: TWEAKS
 ; 
 (which-function-mode)
-
+(setq use-file-dialog nil)
 (server-start t)
 
 ;; (desktop-save-mode 1)
-
-(require 'python)
-(add-to-list 'auto-mode-alist '("\\.tac$" . python-mode))
 
 (add-hook 'after-save-hook
           'executable-make-buffer-file-executable-if-script-p)

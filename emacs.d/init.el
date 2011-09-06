@@ -23,6 +23,7 @@
 (which-function-mode)
 (setq use-file-dialog nil)
 (server-start t)
+(tool-bar-mode -1)
 
 ;; (desktop-save-mode 1)
 
@@ -91,11 +92,13 @@
 (global-set-key [f9] 'jmc-eval-to-here)
 
 
-(global-set-key (kbd "C-<return>") 'jmc-make-recompile)
-(global-set-key (kbd "C-S-<return>") 'jmc-make-recompile)
+(setq compilation-ask-about-save nil)
+(global-set-key (kbd "C-<return>") 'recompile)
+(global-set-key (kbd "C-S-<return>") 'recompile)
 (require 'python)
 (define-key python-mode-map (kbd "C-<return>") 'flynote-check)
 
+;; (require 'ipython)
 ;; (define-key python-mode-map (kbd "C-S-<return>") 'jmc-test-something)
 ; 
 ; 
@@ -119,3 +122,9 @@
 ;       tramp-verbose 4)
 ; ;; (find-file "/dev6-md2.sendgrid.net:work/kamta/Makefile")
 ; 
+(custom-set-variables
+  ;; custom-set-variables was added by Custom.
+  ;; If you edit it by hand, you could mess it up, so be careful.
+  ;; Your init file should contain only one such instance.
+  ;; If there is more than one, they won't work right.
+ '(safe-local-variable-values (quote ((test-case-name . twisted\.test\.test_process) (test-case-name . twisted\.test\.test_internet\,twisted\.internet\.test\.test_posixbase)))))

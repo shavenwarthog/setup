@@ -43,7 +43,7 @@ icon: /usr/share/icons/skype.png
 # mustache!
 icon: /usr/share/skype/avatars/Skypers of the Caribbean.png
 # icon = 'dialog-warning'
-alert_words: @all @john @johnm @cali
+alert_words: @all @john @johnm @cali @mp
 alert_users: goz
 '''
 
@@ -60,6 +60,11 @@ def parseconfig(configstr):
     par.readfp( StringIO.StringIO(configstr) )
     return dict(par.items('default'))
 
+
+def splitwords(line):
+    return filter(None, re.split('[^a-zA-Z0-9_@]', line))
+
+
 def notify(conf, argv):
     # parse "-eSkypeLogin" => {'e': 'SkypeLogin'}
     # ignore args not passed in
@@ -73,7 +78,7 @@ def notify(conf, argv):
     logging.debug('message=%r alert=%r users=%r', msg, alerts, users)
 
     def important(message, alert_words):
-        text = message.get('m','').lower()
+        text = splitwords( message.get('m','').lower() )
         return any( (n in text for n in alert_words) )
 
     if msg.get('e') != 'ChatIncoming':

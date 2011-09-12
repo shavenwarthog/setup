@@ -25,7 +25,7 @@ enable Execute on Any Event, following in one line:
 # ("-s", "--size", dest="fsize", help="incoming file size")
 # ("-f", "--filename", dest="fname", help="file name", metavar="FILE")
 
-import ConfigParser, logging, StringIO, sys
+import ConfigParser, logging, re, StringIO, sys
 try:
     import pynotify
 except ImportError:

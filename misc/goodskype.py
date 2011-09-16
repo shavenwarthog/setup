@@ -26,6 +26,7 @@ enable Execute on Any Event, following in one line:
 # ("-f", "--filename", dest="fname", help="file name", metavar="FILE")
 
 import ConfigParser, logging, re, StringIO, sys
+from optparse import OptionParser
 try:
     import pynotify
 except ImportError:
@@ -44,16 +45,11 @@ icon: /usr/share/icons/skype.png
 icon: /usr/share/skype/avatars/Skypers of the Caribbean.png
 # icon = 'dialog-warning'
 alert_words: @all @john @johnm @cali @mp
-alert_users: goz
+alert_users: goz foobarf00
 '''
 
 # ::::::::::::::::::::::::::::::::::::::::::::::::::
 
-
-logging.basicConfig(
-    filename='/tmp/goodskype.log',
-    level=logging.DEBUG,
-    )
 
 def parseconfig(configstr):
     par = ConfigParser.SafeConfigParser()
@@ -64,26 +60,29 @@ def parseconfig(configstr):
 def splitwords(line):
     return filter(None, re.split('[^a-zA-Z0-9_@]', line))
 
-
-def notify(conf, argv):
+def parse_skypeargs(args):
     # parse "-eSkypeLogin" => {'e': 'SkypeLogin'}
     # ignore args not passed in
-    msg = dict( (
+    return dict( (
             (arg[1], arg[2:])
-            for arg in argv[1:]
+            for arg in args
             if len(arg) > 2 and arg[2] != '%'
             ) )
+
+def notify(conf, args):
+    msg = parse_skypeargs(args)
     alerts = conf['alert_words'].split()
     users = conf['alert_users'].split()
     logging.debug('message=%r alert=%r users=%r', msg, alerts, users)
+
+    if msg.get('e') != 'ChatIncoming':
+        logging.debug('(not incoming)')
+        sys.exit(0)
 
     def important(message, alert_words):
         text = splitwords( message.get('m','').lower() )
         return any( (n in text for n in alert_words) )
 
-    if msg.get('e') != 'ChatIncoming':
-        logging.debug('(not incoming)')
-        sys.exit(0)
     if not (
         msg.get('u') in users
         or important(msg, alerts)
@@ -102,6 +101,16 @@ def notify(conf, argv):
 
 
 def main():
+    parser = OptionParser()
+    parser.add_option('-v', '--verbose', dest='verbose', default=True,
+                      help='extra logging to /tmp/goodskype.log')
+    opts,_ = parser.parse_args()
+
+    logging.basicConfig(
+        filename='/tmp/goodskype.log',
+        level=logging.DEBUG if opts.verbose else logging.INFO,
+        )
+
     try:
         notify( parseconfig(CONFIG), sys.argv )
     except Exception:

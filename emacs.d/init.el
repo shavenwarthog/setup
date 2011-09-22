@@ -20,6 +20,10 @@
 ; 
 ; ;; :::::::::::::::::::::::::::::::::::::::::::::::::: TWEAKS
 ; 
+
+
+(add-to-list 'auto-mode-alist '("\\.mak$" . makefile-mode))
+
 (which-function-mode)
 (setq use-file-dialog nil)
 (server-start t)
@@ -127,4 +131,12 @@
   ;; If you edit it by hand, you could mess it up, so be careful.
   ;; Your init file should contain only one such instance.
   ;; If there is more than one, they won't work right.
- '(safe-local-variable-values (quote ((test-case-name . twisted\.test\.test_process) (test-case-name . twisted\.test\.test_internet\,twisted\.internet\.test\.test_posixbase)))))
+ '(safe-local-variable-values (quote ((test-case-name . twisted\.mail\.test\.test_smtp) (test-case-name . twisted\.test\.test_process) (test-case-name . twisted\.test\.test_internet\,twisted\.internet\.test\.test_posixbase)))))
+
+(server-start)
+
+
+(require 'compile)
+(setq  compilation-search-path '("bin"))
+
+

@@ -48,7 +48,7 @@
 ; ;; :::::::::::::::::::::::::::::::::::::::::::::::::: FLYNOTE
 ; 
 (require 'python)
-(when (load "~/src/flynote/flynote" t)
+(when nil ;; (load "~/src/flynote/flynote" t)
   (add-to-list 'flynote-load-path "~/src/flynote") ; XX
   (add-hook 'python-mode-hook
 	    (lambda ()
@@ -69,7 +69,7 @@
 ; 
 ; ;; :::::::::::::::::::::::::::::::::::::::::::::::::: EXTERNAL
 ; 
-(load "~/src/sunlight/jmcompile")
+;; (load "~/src/sunlight/jmcompile")
 ; ;; (load "~/src/rudel/rudel-loaddefs.el" t)
 
 ; 
@@ -116,8 +116,8 @@
   ;; If you edit it by hand, you could mess it up, so be careful.
   ;; Your init file should contain only one such instance.
   ;; If there is more than one, they won't work right.
- '(default ((t (:background "black" :foreground "white")))))
-;;			    :height 120)))))
+ '(default ((t (:background "black" :foreground "white"
+			    :height 140)))))
 
 
 ; ;; :::::::::::::::::::::::::::::::::::::::::::::::::: TRAMP
@@ -137,6 +137,6 @@
 
 
 (require 'compile)
-(setq  compilation-search-path '("bin"))
+(setq  compilation-search-path '("." "bin"))
 
 

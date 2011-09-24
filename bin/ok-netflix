@@ -1,0 +1,47 @@
+#!/usr/bin/env python
+
+# python-gtk2 and python-gnome2-extras
+
+import re, sys, urllib
+import socket
+import gtk
+try:
+    import egg.trayicon
+except ImportError:
+    print >>sys.stderr, "sudo aptitude install python-eggtrayicon"
+    sys.exit(1)
+
+
+
+def get_netflix_status():
+    socket.setdefaulttimeout(10)
+
+    page = urllib.urlopen('http://downrightnow.com/netflix').read()
+# except IOError:
+    m = re.search('class=.status (.+?)">(.+?)</span>', page)
+    if m:
+        return m.groups()
+    return None
+
+
+
+def callback(widget, ev):
+    print "Button %i pressed!" % ev.button
+
+
+tray = egg.trayicon.TrayIcon("TrayIcon")
+box = gtk.EventBox()
+label = gtk.Label("Click Me!")
+box.add(label)
+tray.add(box)
+tray.show_all()
+
+box.connect("button-press-event", callback)
+
+gtk.main()
+# urllib.urlopen(
+
+# <h2>Current Status:</h2>
+# <p>
+# <span class="status statusIcon4 sprite">Likely Service Disruption</span>
+# </p>

@@ -7,7 +7,7 @@ alias acs='aptitude search'
 
 # :::::::::::::::::::::::::::::::::::::::::::::::::: GIT
 alias c='git commit -am'
-alias gv='git commit -v'
+alias gv='EDITOR=emacsclient git commit -v'
 alias gva='EDITOR=emacsclient git commit -va'
 alias gds='git diff --stat'
 alias gd='git diff'
@@ -34,3 +34,4 @@ _pip_completion()
 complete -o default -F _pip_completion pip
 # pip bash completion end
 
+alias sggrep='~/work/johnm/sggrep'

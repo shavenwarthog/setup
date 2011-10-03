@@ -60,6 +60,7 @@ def parseconfig(configstr):
 def splitwords(line):
     return filter(None, re.split('[^a-zA-Z0-9_@]', line))
 
+
 def parse_skypeargs(args):
     # parse "-eSkypeLogin" => {'e': 'SkypeLogin'}
     # ignore args not passed in
@@ -69,11 +70,12 @@ def parse_skypeargs(args):
             if len(arg) > 2 and arg[2] != '%'
             ) )
 
+
 def notify(conf, args):
     msg = parse_skypeargs(args)
     alerts = conf['alert_words'].split()
     users = conf['alert_users'].split()
-    logging.debug('message=%r alert=%r users=%r', msg, alerts, users)
+    logging.debug('message=%r', msg)
 
     if msg.get('e') != 'ChatIncoming':
         logging.debug('(not incoming)')
@@ -102,20 +104,21 @@ def notify(conf, args):
 
 def main():
     parser = OptionParser()
-    parser.add_option('-v', '--verbose', dest='verbose', default=True,
-                      help='extra logging to /tmp/goodskype.log')
-    opts,_ = parser.parse_args()
+     # parser.add_option('-v', '--verbose', dest='verbose', default=True,
+     #                   help='extra logging to /tmp/goodskype.log')
 
     logging.basicConfig(
         filename='/tmp/goodskype.log',
-        level=logging.DEBUG if opts.verbose else logging.INFO,
+        level=logging.DEBUG#  if opts.verbose else logging.INFO,
         )
 
     try:
-        notify( parseconfig(CONFIG), sys.argv )
+        # opts,_ = parser.parse_args()
+        notify( parseconfig(CONFIG), sys.argv[1:] )
     except Exception:
         logging.exception('uhoh')
         sys.exit(1)
+
 
 if __name__=='__main__':
     main()

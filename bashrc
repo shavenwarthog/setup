@@ -2,12 +2,18 @@
 
 #  wmii/witray:
 # export PATH=$PATH:$HOME/local/bin/
+export PATH=$HOME/bin:$PATH
 
 # If not running interactively, don't do anything
 [ -z "$PS1" ] && return
 
-[ -f "~/work/bashrc" ] && . ~/work/bashrc
+# :::::::::::::::::::::::::::::::::::::::::::::::::: WORK
 
+# internal IP, XXX requires eth0 be configured
+export INT_IP=`ifconfig eth0 | perl -ne '/addr:(\S+)/ && print $1."\n"'`
+
+
+# :::::::::::::::::::::::::::::::::::::::::::::::::: MISC
 
 export GIT_EDITOR=emacsclient
 export DEBEMAIL="johnlmitchell@gmail.com"

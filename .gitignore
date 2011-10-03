@@ -18,3 +18,5 @@ zoot.*
 icicles/*
 *.pyc
 .emacs.desktop
+session.[0-9]*
+TAGS

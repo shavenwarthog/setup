@@ -1,6 +1,13 @@
 (add-to-list 'load-path "~/.emacs.d/")
 (add-to-list 'load-path "~/.emacs.d/internet/")
 
+
+;; :::::::::::::::::::::::::::::::::::::::::::::::::: PACKAGING
+
+(require 'package)
+(add-to-list 'package-archives 
+	     '("marmalade" . "http://marmalade-repo.org/packages/"))
+
 ;; :::::::::::::::::::::::::::::::::::::::::::::::::: KEYS
 
 ;; C-x r m		bookmark-set
@@ -21,7 +28,7 @@
 ; ;; :::::::::::::::::::::::::::::::::::::::::::::::::: TWEAKS
 ; 
 
-
+(setq redisplay-dont-pause t)
 (add-to-list 'auto-mode-alist '("\\.mak$" . makefile-mode))
 
 (which-function-mode)

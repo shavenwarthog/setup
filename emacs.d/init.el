@@ -27,7 +27,21 @@
   (add-to-list 'load-path "~/.emacs.d/elpa/bookmark+-20111214")
   (require 'bookmark+))
 
-;; :::::::::::::::::::::::::::::::::::::::::::::::::: KEYS
+;; http://avdi.org/devblog/2011/10/06/required-packages-emacs-reboot-12/
+(when nil
+  (setq package-archives
+	'(("gnu" . "http://elpa.gnu.org/packages/")
+	  ("marmalade" . "http://marmalade-repo.org/packages/")
+	  ("Tromey" . "http://tromey.com/elpa/")))
+  (package-initialize)
+  (setq abg-required-packages
+	(list 'xml-rpc 'magit 'gh))
+  (dolist (package abg-required-packages)
+    (when (not (package-installed-p package))
+      (package-refresh-contents)
+      (package-install package))))
+
+;; :::::::::::::::::::::::::::::::::::::::::::: KEYS
 
 ;; C-x r m		bookmark-set
 ;; M-s h r		highlight-regex

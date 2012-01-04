@@ -3,6 +3,8 @@
 #  wmii/witray:
 # export PATH=$PATH:$HOME/local/bin/
 export PATH=$HOME/bin:$PATH
+export PATH=$PATH:/opt/msp430-gcc-4.4.3/bin
+# export MANPATH=/opt/msp430-gcc-4.4.3/man
 
 # If not running interactively, don't do anything
 [ -z "$PS1" ] && return

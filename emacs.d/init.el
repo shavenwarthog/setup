@@ -23,7 +23,7 @@
   
 ;; )
 ;; (package-install 'bookmark+)
-(when t
+(when nil
   (add-to-list 'load-path "~/.emacs.d/elpa/bookmark+-20111214")
   (require 'bookmark+))
 

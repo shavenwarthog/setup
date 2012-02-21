@@ -71,28 +71,33 @@
 
 (require 'python)
 (when t
-  (load "~/src/flynote/flynote" t))
-;;   (message "yay"))
+  (load "~/src/flynote/flynote" t)
+  (define-key python-mode-map (kbd "C-<return>") 'flynote-check))
 
 
-; ;; :::::::::::::::::::::::::::::::::::::::::::::::::: GNUPLOT
-;
+;; :::::::::::::::::::::::::::::::::::::::::::::::::: SUNLIGHT
+
+
+(when t
+  (load "~/src/sunlight/jmcompile12" t))
+
+
+;; :::::::::::::::::::::::::::::::::::::::::::::::::: GNUPLOT
+
+
 (when (load "gnuplot" t)
   (defun jmc-call-gnuplot-on-buffer ()
     (interactive)
     (save-some-buffers t)
     (call-gnuplot-on-buffer))
   (add-to-list 'auto-mode-alist '("\\.plt$" . gnuplot-mode))
-  ;; (define-key gnuplot-mode-map (kbd "C-c C-c") 'jmc-call-gnuplot-on-buffer)
   (define-key gnuplot-mode-map (kbd "C-S-<return>") 'jmc-call-gnuplot-on-buffer))
 
 
 ;; :::::::::::::::::::::::::::::::::::::::::::::::::: KEYS
 
 (global-set-key (kbd "C-<return>") 'recompile)
-(global-set-key (kbd "C-S-<return>") 'recompile)
-(require 'python)
-(define-key python-mode-map (kbd "C-<return>") 'flynote-check)
+
 (global-set-key (kbd "C-x g") 'grep)
 (global-set-key [f8] 'bury-buffer)
 (global-set-key

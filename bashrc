@@ -1,7 +1,8 @@
 # -*- shell-script -*-
 
-#  wmii/witray:
-# export PATH=$PATH:$HOME/local/bin/
+# Splunk
+export PATH=$PATH:/opt/splunk/bin
+
 export PATH=$HOME/bin:$PATH
 export PATH=$PATH:/opt/msp430-gcc-4.4.3/bin
 # export MANPATH=/opt/msp430-gcc-4.4.3/man
@@ -17,9 +18,12 @@ export INT_IP=`ifconfig eth0 | perl -ne '/addr:(\S+)/ && print $1."\n"'`
 
 # :::::::::::::::::::::::::::::::::::::::::::::::::: MISC
 
+export CDPATH=~/work:~/work/apps/devs/johnm
 export GIT_EDITOR=emacsclient
+
 export DEBEMAIL="johnlmitchell@gmail.com"
 export DEBFULLNAME="John Mitchell"
+
 # :::::::::::::::::::::::::::::::::::::::::::::::::: PYTHON
 
 # Python/Pip

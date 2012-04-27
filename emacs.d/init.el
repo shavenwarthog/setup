@@ -23,7 +23,7 @@
   
 ;; )
 ;; (package-install 'bookmark+)
-(when t
+(when nil
   (add-to-list 'load-path "~/.emacs.d/elpa/bookmark+-20111214")
   (require 'bookmark+))
 
@@ -53,24 +53,25 @@
 
 ;; https://github.com/bricoleurs/bricolage/wiki/coding-standards ?
 
-(require 'cperl-mode)
-(fset 'perl-mode 'cperl-mode)
+(when nil
+  (require 'cperl-mode)
+  (fset 'perl-mode 'cperl-mode)
+  
+  (require 'perldoc)
+  
+  (add-to-list 'auto-mode-alist '("\\.t$" . cperl-mode))
 
-(require 'perldoc)
-
-(add-to-list 'auto-mode-alist '("\\.t$" . cperl-mode))
-
-(defun jmc-cperl-mode-hook ()
-  ;; SendGrid ~ GNU style with braces aligned with control words
-  (cperl-set-style "GNU")
-  (setq cperl-continued-brace-offset -2
-	indent-tabs-mode nil
-        c-basic-offset 2
-        cperl-indent-level 2)
-  (show-paren-mode 1)
-  (local-set-key (kbd "C-h f") 'perldoc-at-point))
-
-(setq cperl-mode-hook 'jmc-cperl-mode-hook)
+  (defun jmc-cperl-mode-hook ()
+    ;; SendGrid ~ GNU style with braces aligned with control words
+    (cperl-set-style "GNU")
+    (setq cperl-continued-brace-offset -2
+	  indent-tabs-mode nil
+	  c-basic-offset 2
+	  cperl-indent-level 2)
+    (show-paren-mode 1)
+    (local-set-key (kbd "C-h f") 'perldoc-at-point))
+  
+  (setq cperl-mode-hook 'jmc-cperl-mode-hook))
 
 
   ;; (defvaralias 'c-basic-offset 'tab-width)
@@ -184,7 +185,7 @@
   ;; If you edit it by hand, you could mess it up, so be careful.
   ;; Your init file should contain only one such instance.
   ;; If there is more than one, they won't work right.
- '(default ((t (:background "black" :foreground "white" :height 110)))))
+ '(default ((t (:background "black" :foreground "white" :height 120)))))
 
 
 ;; ; ;; :::::::::::::::::::::::::::::::::::::::::::::::::: TRAMP

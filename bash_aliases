@@ -2,13 +2,21 @@
 
 alias ls='ls -CF'
 
+# :::::::::::::::::::::::::::::::::::::::::::::::::: APT
+
 alias agi='sudo aptitude install'
 alias acs='aptitude search'
 
+# :::::::::::::::::::::::::::::::::::::::::::::::::: MISC
+
+# setterm -term linux -back black -fore white -clear
+
 # :::::::::::::::::::::::::::::::::::::::::::::::::: GIT
 alias c='git commit -am'
-alias gv='EDITOR=emacsclient git commit -v'
-alias gva='EDITOR=emacsclient git commit -va'
+alias gv='git commit -v'
+alias gva='git commit -va'
+# alias gv='EDITOR=emacsclient git commit -v'
+# alias gva='EDITOR=emacsclient git commit -va'
 alias gds='git diff --stat'
 alias gd='git diff'
 

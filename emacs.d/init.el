@@ -12,6 +12,7 @@
 (global-set-key [f9] 'jmc-eval-to-here)
 
 
+
 ;; :::::::::::::::::::::::::::::::::::::::::::::::::: PACKAGING
 
 (setq package-archives 
@@ -71,15 +72,18 @@
 
 (require 'python)
 (when t
-  (load "~/src/flynote/flynote" t)
-  (define-key python-mode-map (kbd "C-<return>") 'flynote-check))
+  (load "~/src/flynote/flynote" t))
+  ;; (define-key python-mode-map (kbd "C-<return>") 'flynote-check))
 
 
 ;; :::::::::::::::::::::::::::::::::::::::::::::::::: SUNLIGHT
 
 
-(when t
+(when nil
   (load "~/src/sunlight/jmcompile12" t))
+
+;; (load "~/src/sunlight/jmcompile1205" t))
+
 
 
 ;; :::::::::::::::::::::::::::::::::::::::::::::::::: GNUPLOT
@@ -97,6 +101,7 @@
 ;; :::::::::::::::::::::::::::::::::::::::::::::::::: KEYS
 
 (global-set-key (kbd "C-<return>") 'recompile)
+(global-set-key (kbd "C-S-<return>") 'recompile)
 
 (global-set-key (kbd "C-x g") 'grep)
 (global-set-key [f8] 'bury-buffer)
@@ -189,3 +194,4 @@
 
 ;; (require 'compile)
 ;; (setq  compilation-search-path '("." "bin"))
+(put 'narrow-to-region 'disabled nil)

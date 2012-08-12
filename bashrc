@@ -1,13 +1,24 @@
 # -*- shell-script -*-
 
-#  wmii/witray:
-# export PATH=$PATH:$HOME/local/bin/
+export PATH=$PATH:/opt/splunk/bin
+export PATH=$PATH:/opt/vagrant/bin
+export PATH=$PATH:/opt/HipChat/bin
+
 export PATH=$HOME/bin:$PATH
 export PATH=$PATH:/opt/msp430-gcc-4.4.3/bin
 # export MANPATH=/opt/msp430-gcc-4.4.3/man
 
+# for Chef, via "Test-Driven Infrastructure with Chef"
+[[ -s "~/.rvm/scripts/rvm" ]] && source "~/.rvm/scripts/rvm"
+
+	
+export PIP_DOWNLOAD_CACHE=$HOME/.pip_download_cache
+
+
 # If not running interactively, don't do anything
 [ -z "$PS1" ] && return
+
+
 
 # :::::::::::::::::::::::::::::::::::::::::::::::::: WORK
 
@@ -17,13 +28,18 @@ export INT_IP=`ifconfig eth0 | perl -ne '/addr:(\S+)/ && print $1."\n"'`
 
 # :::::::::::::::::::::::::::::::::::::::::::::::::: MISC
 
+export CDPATH=~/work:~/work/apps/devs/johnm
+test -d ~/checkout && export CDPATH=~/checkout:~/checkout/apps/devs/johnm
+
 export GIT_EDITOR=emacsclient
+
 export DEBEMAIL="johnlmitchell@gmail.com"
 export DEBFULLNAME="John Mitchell"
+
 # :::::::::::::::::::::::::::::::::::::::::::::::::: PYTHON
 
 # Python/Pip
-export PIP_REQUIRE_VIRTUALENV=true
+# export PIP_REQUIRE_VIRTUALENV=true
 # export PIP_RESPECT_VIRTUALENV=true
 
 

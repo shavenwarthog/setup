@@ -80,14 +80,20 @@
 (tool-bar-mode -1)
 ; 
 ; 
-; ;; :::::::::::::::::::::::::::::::::::::::::::::::::: MODULES
-; 
-(require 'ibuffer)
+;; :::::::::::::::::::::::::::::::::::::::::::::::::: MODULES
+
+(when (require 'ibuffer)
+  (defalias 'list-buffers 'ibuffer))
 
 (when (require 'ido)
   (ido-mode t)
   (setq ido-max-directory-size 10000
         ido-enable-flex-matching t)) ;; enable fuzzy matching
+
+(when nil
+  (add-to-list 'load-path "~/.emacs.d/yasnippet")
+  (require 'yasnippet)
+  (yas-global-mode 1))
 
 ; 
 ;; :::::::::::::::::::::::::::::::::::::::::::::::::: FLYNOTE
@@ -127,10 +133,10 @@
 (global-set-key (kbd "C-x c") 'compile)
 ; 
 ; 
-; ;; :::::::::::::::::::::::::::::::::::::::::::::::::: COMPILATION
+;; :::::::::::::::::::::::::::::::::::::::::::::::::: COMPILATION
 ; 
 ; 
-; (setq compilation-ask-about-save nil)
+(setq compilation-ask-about-save nil)
 ; 
 ; ;; :::::::::::::::::::::::::::::::::::::::::::::::::: CUSTOM
 ; 

@@ -4,10 +4,12 @@ alias ls='ls -CF'
 
 # :::::::::::::::::::::::::::::::::::::::::::::::::: APT
 
-alias agi='sudo aptitude install'
-alias acs='aptitude search'
+alias agi='sudo apt-get install'
+alias acs='apt-cache search'
 
 # :::::::::::::::::::::::::::::::::::::::::::::::::: MISC
+
+alias rgrep='egrep -r'
 
 # setterm -term linux -back black -fore white -clear
 

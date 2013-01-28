@@ -14,9 +14,22 @@
 
 ;; :::::::::::::::::::::::::::::::::::::::::::::::::: DJANGO
 
-(when nil
+(when t
   (add-to-list 'load-path "~/.emacs.d/pony-mode/src")
   (require 'pony-mode))
+
+
+;; :::::::::::::::::::::::::::::::::::::::::::::::::: HTML+JS
+
+(when t
+  (add-to-list 'load-path "~/.emacs.d/multi-web-mode/")
+  (require 'multi-web-mode)
+  (setq mweb-default-major-mode 'html-mode)
+  (setq mweb-tags '((php-mode "<\\?php\\|<\\? \\|<\\?=" "\\?>")
+		    (js-mode "<script +\\(type=\"text/javascript\"\\|language=\"javascript\"\\)[^>]*>" "</script>")
+		    (css-mode "<style +type=\"text/css\"[^>]*>" "</style>")))
+  (setq mweb-filename-extensions '("php" "htm" "html" "ctp" "phtml" "php4" "php5"))
+  (multi-web-global-mode 1))
 
 ; 
 ; 
@@ -69,6 +82,10 @@
 ; 
 ; ;; :::::::::::::::::::::::::::::::::::::::::::::::::: TWEAKS
 ; 
+
+(global-set-key (kbd "<f5>") 'kmacro-end-and-call-macro)
+(global-set-key (kbd "<f6>") 'next-error)
+
 ; (add-to-list 'auto-mode-alist '("\\.md$" . markdown-mode))
 ; 
 (add-hook 'after-save-hook
@@ -85,10 +102,35 @@
 (when (require 'ibuffer)
   (defalias 'list-buffers 'ibuffer))
 
+
 (when (require 'ido)
   (ido-mode t)
   (setq ido-max-directory-size 10000
         ido-enable-flex-matching t)) ;; enable fuzzy matching
+
+
+(when t
+  (require 'python)
+  (load "~/src/sunlight/logme" t)
+  (define-key python-mode-map (kbd "<f10>") 'jm-logme)
+  (define-key python-mode-map (kbd "C-<f10>") 'jm-if0))
+
+  
+  (load "~/src/sunlight/goodvalue" t)
+  (define-key python-mode-map (kbd "S-<f10>") 'jm-insert-goodvalue))
+
+
+;; M-/ dabbrev-expand
+(when nil
+  (when (require 'pymacs)
+    (setq ropemacs-confirm-saving nil)
+    (pymacs-load "ropemacs" "rope-")))
+
+;; (local-set-key;; M-/ dabbrev-expand
+;; (define-key python-mode-map (kbd "M-/") 'dabbrev-expand)
+
+
+
 
 (when nil
   (add-to-list 'load-path "~/.emacs.d/yasnippet")

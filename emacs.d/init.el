@@ -11,6 +11,11 @@
     (eval-region 0 (point)))
 (global-set-key [f9] 'jmc-eval-to-here)
 
+(global-set-key 
+ (kbd "<f11>")
+ (lambda ()
+   (interactive)
+   (save-some-buffers t)))
 
 ;; :::::::::::::::::::::::::::::::::::::::::::::::::: DJANGO
 
@@ -25,6 +30,7 @@
   (add-to-list 'load-path "~/.emacs.d/multi-web-mode/")
   (require 'multi-web-mode)
   (setq mweb-default-major-mode 'html-mode)
+;;   (setq mweb-default-major-mode 'nxml-mode)
   (setq mweb-tags '((php-mode "<\\?php\\|<\\? \\|<\\?=" "\\?>")
 		    (js-mode "<script +\\(type=\"text/javascript\"\\|language=\"javascript\"\\)[^>]*>" "</script>")
 		    (css-mode "<style +type=\"text/css\"[^>]*>" "</style>")))
@@ -95,6 +101,7 @@
 (which-function-mode)
 (setq use-file-dialog nil)
 (tool-bar-mode -1)
+(setq-default tab-width 4)
 ; 
 ; 
 ;; :::::::::::::::::::::::::::::::::::::::::::::::::: MODULES
@@ -108,23 +115,41 @@
   (setq ido-max-directory-size 10000
         ido-enable-flex-matching t)) ;; enable fuzzy matching
 
+(global-set-key 
+ (kbd "C-x i")
+ (lambda () 
+   (interactive)
+   (insert-register 49)))				; "1"
+
+
+
 
 (when t
   (require 'python)
   (load "~/src/sunlight/logme" t)
   (define-key python-mode-map (kbd "<f10>") 'jm-logme)
-  (define-key python-mode-map (kbd "C-<f10>") 'jm-if0))
-
+  ;; (define-key python-mode-map (kbd "C-<f10>") 'jm-if0)
+  (global-set-key (kbd "C-<f10>") 'jm-if0)
   
   (load "~/src/sunlight/goodvalue" t)
   (define-key python-mode-map (kbd "S-<f10>") 'jm-insert-goodvalue))
 
+;;  (define-key js-mode-map (kbd "<f10>") 'jm-logme)
+;;  (define-key mweb-mode-map (kbd "C-<f10>") 'jm-if0)
+
+
+;; TODO: optimize
+(when (load "js")
+  (define-key js-mode-map (kbd "<f10>") 'jm-logme)
+  (define-key html-mode-map (kbd "<f10>") 'jm-logme)
+  (define-key js-mode-map (kbd "M-.") 'find-tag))
 
 ;; M-/ dabbrev-expand
 (when nil
   (when (require 'pymacs)
     (setq ropemacs-confirm-saving nil)
     (pymacs-load "ropemacs" "rope-")))
+
 
 ;; (local-set-key;; M-/ dabbrev-expand
 ;; (define-key python-mode-map (kbd "M-/") 'dabbrev-expand)
@@ -255,9 +280,9 @@
 ; 
 ; ;; (require 'compile)
 ; ;; (setq  compilation-search-path '("." "bin"))
-; (put 'narrow-to-region 'disabled nil)
 
 
 ;; YED Django
 ;; Hi-lock: (("[Rr]ender.+[Hh]tml" (0 (quote hi-yellow) t)))
 
+(put 'narrow-to-region 'disabled nil)

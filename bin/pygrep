@@ -30,7 +30,6 @@ def pygrep(opts, args):
 
 def main():
     parser = optparse.OptionParser()
-    # parser.add_option('--filepat', dest='filepat')
     parser.add_option("-w", "--web", dest="type_web", action="store_true")
 
     (options, args) = parser.parse_args()
@@ -38,7 +37,7 @@ def main():
     if options.type_web:
         options.patterns = ['*.js', '*.html']
     pygrep(options, args)
-    sys.exit(0)
+
 
 if __name__=='__main__':
     main()

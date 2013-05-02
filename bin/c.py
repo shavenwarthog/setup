@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
 '''
-c -- given commit message, tag with Jira story ID
+c -- given commit message and "git flow", tag with Jira story ID
 '''
 
 import os, re, sys
@@ -11,20 +11,17 @@ def main(argv):
 
     match = filter(None, map(branch_pat.match, 
                              os.popen('git branch').readlines()))
-    if not match:
-        sys.exit('ENT Feature branch not found')
-
-    branch = 'ENT-{0}'.format(match[0].group(1))
+    branch = None
+    msg = ' '.join(argv)        # pylint: disable=W0612
+    if match:
+        branch = 'ENT-{0}'.format(match[0].group(1))
+        msg += ' - {branch}'.format(**locals())
 
     if not argv:
         print branch
         return
 
-    msg = ' '.join(argv)
-    print branch,msg
-    cmd = """git commit -am '{msg} - {branch}'""".format(**locals())
-    if 0:
-        print cmd
+    cmd = """git commit -am '{msg}'""".format(**locals())
     sys.exit( os.system(cmd) )
 
 

@@ -7,15 +7,23 @@ c -- given commit message and "git flow", tag with Jira story ID
 import os, re, sys
 
 def main(argv):
-    branch_pat = re.compile('\*\sfeature/ent(\d+)')
+    branch_pat = re.compile('\*\sfeature/([a-z]+)(\d+)')
 
     match = filter(None, map(branch_pat.match, 
                              os.popen('git branch').readlines()))
     branch = None
     msg = ' '.join(argv)        # pylint: disable=W0612
     if match:
-        branch = 'ENT-{0}'.format(match[0].group(1))
-        msg += ' - {branch}'.format(**locals())
+        name = match[0].group(1)
+        if name=='ent':
+            name = name.upper()
+        if name=='ENT':
+            branch = '{}-{}'.format(
+                name,  # "issue" or "ENT"
+                match[0].group(2),
+                )
+
+            msg += ' - {branch}'.format(**locals())
 
     if not argv:
         print branch

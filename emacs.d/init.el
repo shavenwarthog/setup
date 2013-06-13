@@ -19,13 +19,29 @@
 
 ;; http://www.reddit.com/r/emacs/comments/1aqbx4/what_would_be_your_minimal_initel_file/
 
-;; basic stuff
+;; :::::::::::::::::::::::::::::::::::::::::::::::::: CUSTOMIZATION
+
+(global-auto-revert-mode t)
+
+
+;; (setq-default show-trailing-whitespace nil)
 (show-paren-mode 1)
+(which-function-mode)
+
 (setq-default indent-tabs-mode nil
-              vc-handled-backends nil
               make-backup-files nil)
 
-;; ido
+
+;; :::::::::::::::::::::::::::::::::::::::::::::::::: PACKAGING
+
+(when (require 'package)
+  (add-to-list 'package-archives
+               '("marmalade" . "http://marmalade-repo.org/packages/") t)
+  (package-initialize))
+
+
+;; :::::::::::::::::::::::::::::::::::::::::::::::::: IDO
+
 (when (require 'ido)
   (ido-mode t)
   (setq 
@@ -39,34 +55,39 @@
    ;; ido-use-url-at-point t                  ;??
    ido-use-virtual-buffers t))
 
+
 ;; :::::::::::::::::::::::::::::::::::::::::::::::::: DJANGO
 
 (when t
   (add-to-list 'load-path "~/.emacs.d/pony-mode/src")
   (require 'pony-mode))
 
-;; :::::::::::::::::::::::::::::::::::::::::::::::::: PACKAGING
 
-(when (require 'package)
-  (add-to-list 'package-archives
-               '("marmalade" . "http://marmalade-repo.org/packages/") t)
-  (package-initialize))
+;; :::::::::::::::::::::::::::::::::::::::::::::::::: WEB
+
+(when t
+  (add-to-list 'load-path "~/.emacs.d/multi-web-mode/")
+  (require 'multi-web-mode)
+  (setq mweb-default-major-mode 'html-mode)
+;;   (setq mweb-default-major-mode 'nxml-mode)
+  (setq mweb-tags 
+        '(
+          (js-mode "<script +\\(type=\"text/javascript\"\\|language=\"javascript\"\\)[^>]*>" "</script>")
+          (css-mode "<style +type=\"text/css\"[^>]*>" "</style>")))
+  (setq mweb-filename-extensions '("php" "htm" "html" "ctp" "phtml" "php4" "php5"
+                                   "md")) ; XX JM
+  (multi-web-global-mode 1))
+
+;; (require 'webdev)                          ; F5 = reload Firefox
+
+
+;; :::::::::::::::::::::::::::::::::::::::::::::::::: EPROJECT
+
+(load "eproject")
 
 
 ;; ################################################## HISTORICAL
 
-;; ;; :::::::::::::::::::::::::::::::::::::::::::::::::: HTML+JS
-
-;; (when t
-;;   (add-to-list 'load-path "~/.emacs.d/multi-web-mode/")
-;;   (require 'multi-web-mode)
-;;   (setq mweb-default-major-mode 'html-mode)
-;; ;;   (setq mweb-default-major-mode 'nxml-mode)
-;;   (setq mweb-tags '((php-mode "<\\?php\\|<\\? \\|<\\?=" "\\?>")
-;; 		    (js-mode "<script +\\(type=\"text/javascript\"\\|language=\"javascript\"\\)[^>]*>" "</script>")
-;; 		    (css-mode "<style +type=\"text/css\"[^>]*>" "</style>")))
-;;   (setq mweb-filename-extensions '("php" "htm" "html" "ctp" "phtml" "php4" "php5"))
-;;   (multi-web-global-mode 1))
 
 ;; ; 
 ;; ; 
@@ -120,9 +141,48 @@
 ; ;; :::::::::::::::::::::::::::::::::::::::::::::::::: TWEAKS
 ; 
 
+(setq-default tab-width 4)
 (tool-bar-mode -1)
 (add-hook 'after-save-hook
           'executable-make-buffer-file-executable-if-script-p)
+
+(when t
+  (require 'python)
+  (load "~/src/sunlight/logme" t)
+  (define-key python-mode-map (kbd "<f10>") 'jm-logme)
+  (define-key python-mode-map (kbd "C-<f10>") 'jm-if0)
+  (global-set-key (kbd "C-<f10>") 'jm-if0))
+
+(when t
+  (load "~/src/sunlight/jmcompile" t)
+  (global-set-key (kbd "C-S-<return>") 'jmc-recompile))
+  
+(when (require 'js)
+  (define-key js-mode-map (kbd "<f10>") 'jm-logme)
+  (define-key js-mode-map (kbd "M-.") 'find-tag) ;XX override
+  (define-key js-mode-map (kbd "C-<return>") 'flynote-check)
+  )
+
+(when t ;; (require 'html)
+  (define-key html-mode-map (kbd "<f10>") 'jm-logme)
+  (define-key html-mode-map (kbd "C-<return>") 'flynote-check))
+
+
+;; :::::::::::::::::::::::::::::::::::::::::::::::::: FLYNOTE
+
+
+(require 'python)
+(when t
+  (load "~/src/flynote/flynote" t)
+  (define-key python-mode-map (kbd "C-<return>") 'flynote-check))
+
+
+;; :::::::::::::::::::::::::::::::::::::::::::::::::: KEYS
+
+(global-set-key (kbd "C-x c") 'compile)
+(global-set-key (kbd "C-x g") 'grep)
+
+
 
 ;; (global-set-key (kbd "<f5>") 'kmacro-end-and-call-macro)
 ;; (global-set-key (kbd "<f6>") 'next-error)
@@ -133,7 +193,6 @@
 ;; ; 
 ;; (which-function-mode)
 ;; (setq use-file-dialog nil)
-;; (setq-default tab-width 4)
 ;; ; 
 ;; ; 
 ;; ;; :::::::::::::::::::::::::::::::::::::::::::::::::: MODULES
@@ -156,10 +215,6 @@
 
 
 
-;; (when t
-;;   (require 'python)
-;;   (load "~/src/sunlight/logme" t)
-;;   (define-key python-mode-map (kbd "<f10>") 'jm-logme)
 ;;   ;; (define-key python-mode-map (kbd "C-<f10>") 'jm-if0)
 ;;   (global-set-key (kbd "C-<f10>") 'jm-if0)
   
@@ -195,13 +250,6 @@
 ;;   (yas-global-mode 1))
 
 ;; ; 
-;; :::::::::::::::::::::::::::::::::::::::::::::::::: FLYNOTE
-
-
-(require 'python)
-(when t
-  (load "~/src/flynote/flynote" t)
-  (define-key python-mode-map (kbd "C-<return>") 'flynote-check))
 
 ;; ;; :::::::::::::::::::::::::::::::::::::::::::::::::: GNUPLOT
 
@@ -217,12 +265,7 @@
 ;; 	'jmc-call-gnuplot-on-buffer)))
 
 
-;; :::::::::::::::::::::::::::::::::::::::::::::::::: KEYS
 
-(global-set-key (kbd "C-x c") 'compile)
-(global-set-key (kbd "C-<return>") 'recompile)
-(global-set-key (kbd "C-x g") 'grep)
-;; (global-set-key (kbd "C-S-<return>") 'recompile)
 ;; ; 
 ;; ; (global-set-key
 ;; ;  (kbd "C-S-<f8>")
@@ -317,3 +360,4 @@
 ;; ;; Hi-lock: (("[Rr]ender.+[Hh]tml" (0 (quote hi-yellow) t)))
 
 ;; (put 'narrow-to-region 'disabled nil)
+(put 'downcase-region 'disabled nil)

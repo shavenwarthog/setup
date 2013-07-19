@@ -1,0 +1,95 @@
+#!/usr/bin/env python
+
+'''
+gping -- show network status
+'''
+
+import os, re, subprocess
+
+import gevent
+from gevent.queue import Queue
+
+
+
+def ping(ip):
+    return os.system('ping -c1 {} > /dev/null'.format(ip))
+
+def internal_ping():
+    return ping('192.168.1.1') # TODO: real router addr
+
+def external_ping():
+    return ping('4.2.2.2')
+
+def dns_status():
+    return os.system('dig yahoo.com > /dev/null')
+
+
+def follow(fname, dest):
+    f = file(fname)
+    f.seek(0,2)                 # go to the end
+    while True:
+        line = f.readline()
+        if not line:
+            gevent.sleep(.1)
+        else:
+            dest.put(line)
+
+
+def grep(pattern, source, dest):
+    regex = re.compile(pattern)
+
+    def do_stuff():
+        while True:
+            line = source.get()
+            if regex.match(line):
+                dest.put(line)
+
+    return do_stuff
+
+def printer(source):
+    while True:
+        line = source.get()
+        print line.strip()
+
+def zoot():
+    source_queue = Queue()
+    filtered_queue = Queue()
+
+    p = gevent.spawn(printer, filtered_queue)
+    g = gevent.spawn(grep(".*pants.*", source_queue, filtered_queue))
+    follow("/var/log/system.log", source_queue)
+
+def tail():
+    network_pat = re.compile(
+        '(cfg80211|iwlwifi|NetworkManager|wlan0:|wpa_supplicant)'
+        )
+    state_pat = re.compile('interface state: (.+) -> (.+)')
+
+    for line in subprocess.Popen(
+        'tail -1000 /var/log/syslog'.split(),
+        bufsize=1,                  # line buffered
+        stdout=subprocess.PIPE,
+        ).stdout:
+        if not network_pat.search(line):
+            if 0:
+                print '\t?',line,
+            continue
+        m = state_pat.search(line)
+        if not m:
+            print '\t',line,
+            continue
+        print m.groups()
+
+
+def yorn(status):
+    return 'ok' if status==0 else 'FAIL'
+
+
+def main():
+    print 'router:\t\t', yorn(internal_ping())
+    print 'internet:\t', yorn(external_ping())
+    print 'DNS:\t\t', yorn(dns_status())
+
+
+if __name__=='__main__':
+    main()

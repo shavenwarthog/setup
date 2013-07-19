@@ -24,6 +24,20 @@ def dns_status():
     return os.system('dig yahoo.com > /dev/null')
 
 
+class Pattern(object):
+    PAT = '.*'
+
+    def __init__(self):
+        self.pat = re.compile(self.PAT)
+
+    def match(self, line):
+        return self.pat.match(line)
+
+    def handle(self, m, dest):
+        if m:
+            dest.put( m.group(0) )
+
+
 def follow(fname, dest):
     f = file(fname)
     f.seek(0,2)                 # go to the end
@@ -46,6 +60,16 @@ def grep(pattern, source, dest):
 
     return do_stuff
 
+def grep2(source, dest):
+    pat = Pattern()
+
+    def do_stuff():
+        while True:
+            line = source.get()
+            pat.handle( pat.match(line), dest )
+
+    return do_stuff
+
 def printer(source):
     while True:
         line = source.get()
@@ -56,8 +80,12 @@ def zoot():
     filtered_queue = Queue()
 
     p = gevent.spawn(printer, filtered_queue)
-    g = gevent.spawn(grep(".*pants.*", source_queue, filtered_queue))
-    follow("/var/log/system.log", source_queue)
+    if 0:
+        g = gevent.spawn(grep(".*wlan0.*", source_queue, filtered_queue))
+    else:
+        g = gevent.spawn(grep2(source_queue, filtered_queue))
+    follow("/var/log/syslog", source_queue)
+
 
 def tail():
     network_pat = re.compile(
@@ -92,4 +120,7 @@ def main():
 
 
 if __name__=='__main__':
-    main()
+    if 1:
+        zoot()
+    else:
+        main()

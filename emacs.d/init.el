@@ -21,6 +21,8 @@
 
 ;; :::::::::::::::::::::::::::::::::::::::::::::::::: CUSTOMIZATION
 
+(setq python-python-command "/home/johnm/Envs/recipeapp/bin/python")
+
 (global-auto-revert-mode t)
 
 
@@ -64,6 +66,17 @@
 
 
 ;; :::::::::::::::::::::::::::::::::::::::::::::::::: WEB
+
+;; TODO: js-mode for .json files
+;; http://stackoverflow.com/questions/435847/emacs-mode-to-edit-json
+(defun beautify-json ()
+  (interactive)
+  (let ((b (if mark-active (min (point) (mark)) (point-min)))
+        (e (if mark-active (max (point) (mark)) (point-max))))
+    (shell-command-on-region b e
+     "python -mjson.tool" (current-buffer) t)))
+(define-key js-mode-map (kbd "C-c C-f") 'beautify-json)
+
 
 (when t
   (add-to-list 'load-path "~/.emacs.d/multi-web-mode/")
@@ -152,6 +165,10 @@
   (define-key python-mode-map (kbd "<f10>") 'jm-logme)
   (define-key python-mode-map (kbd "C-<f10>") 'jm-if0)
   (global-set-key (kbd "C-<f10>") 'jm-if0))
+
+(when t
+  (load "~/src/sunlight/goodvalue" t)
+  (global-set-key (kbd "S-<f10>") 'jm-insert-goodvalue))
 
 (when t
   (load "~/src/sunlight/jmcompile" t)

@@ -3,8 +3,12 @@
 '''
 gping -- show network status
 '''
+# nmcli dev list
+# nmcli dev disconnect iface wlan0
+# nmcli nm enable false 
 
-import os, re, subprocess
+import argparse, os, re, subprocess, sys, time
+from functools import partial
 
 import gevent
 from gevent.queue import Queue
@@ -12,16 +16,29 @@ from gevent.queue import Queue
 
 
 def ping(ip):
-    return os.system('ping -c1 {} > /dev/null'.format(ip))
+    return os.system('ping -c1 {} 2>/dev/null > /dev/null'.format(ip))
 
-def internal_ping():
-    return ping('192.168.1.1') # TODO: real router addr
 
 def external_ping():
     return ping('4.2.2.2')
 
-def dns_status():
-    return os.system('dig yahoo.com > /dev/null')
+
+def dns_status(server=None):
+    if server:
+        server = '@'+server
+    return os.system('dig {} yahoo.com > /dev/null'.format(server))
+
+
+def nm_bounce():
+    return os.system('nmcli nm enable false ; nmcli nm enable true')
+
+
+def nm_router_ip():
+    ips = re.findall(
+        'dhcp_server_identifier = ([0-9.]+)',
+        os.popen('nmcli dev list').read(),
+        )
+    return ips[0] if ips else None
 
 
 class Pattern(object):
@@ -30,12 +47,42 @@ class Pattern(object):
     def __init__(self):
         self.pat = re.compile(self.PAT)
 
-    def match(self, line):
-        return self.pat.match(line)
+    def process(self, m):
+        return m.group(0)
 
-    def handle(self, m, dest):
-        if m:
-            dest.put( m.group(0) )
+    def handle(self, line, dest):
+        m = self.pat.match(line)
+        if not m:
+            print '\t?',line,
+            return
+        res = self.process(m)
+        if res:
+            dest.put( res )
+
+
+class NetworkManagerPat(Pattern):
+    PAT = '.*NetworkManager\S+ (.+)'
+
+    STATES = {
+        'associating': 'a', # authenticating -> associating
+        'handshake': '4', # associating -> 4-way handshake
+        'completed': 'OK', # 4-way handshake -> completed
+        }
+
+    def process(self, m):
+        line = m.group(0)
+        if re.search('(/php|IP6|IPv6)', line):
+            return None
+        word = None
+        try:
+            word = m.group(1).split()[-1]
+        except KeyError:
+            pass
+        label = self.STATES.get(word)
+        if not label:
+            print '?? {}'.format(line)
+        else:
+            return label
 
 
 def follow(fname, dest):
@@ -60,14 +107,10 @@ def grep(pattern, source, dest):
 
     return do_stuff
 
-def grep2(source, dest):
-    pat = Pattern()
-
+def grep2(pat, source, dest):
     def do_stuff():
         while True:
-            line = source.get()
-            pat.handle( pat.match(line), dest )
-
+            pat.handle( source.get(), dest )
     return do_stuff
 
 def printer(source):
@@ -75,19 +118,17 @@ def printer(source):
         line = source.get()
         print line.strip()
 
-def zoot():
+def cmd_tail():
     source_queue = Queue()
     filtered_queue = Queue()
 
-    p = gevent.spawn(printer, filtered_queue)
-    if 0:
-        g = gevent.spawn(grep(".*wlan0.*", source_queue, filtered_queue))
-    else:
-        g = gevent.spawn(grep2(source_queue, filtered_queue))
+    _p = gevent.spawn(printer, filtered_queue)
+    nmpat = NetworkManagerPat()
+    _g = gevent.spawn(grep2(nmpat, source_queue, filtered_queue))
     follow("/var/log/syslog", source_queue)
 
 
-def tail():
+def OLD_tail():
     network_pat = re.compile(
         '(cfg80211|iwlwifi|NetworkManager|wlan0:|wpa_supplicant)'
         )
@@ -113,14 +154,45 @@ def yorn(status):
     return 'ok' if status==0 else 'FAIL'
 
 
-def main():
-    print 'router:\t\t', yorn(internal_ping())
+def show_status():
+    router_ip = nm_router_ip()
+    print 'router IP:\t', router_ip
+    print 'router:\t\t', yorn(ping(router_ip))
     print 'internet:\t', yorn(external_ping())
     print 'DNS:\t\t', yorn(dns_status())
 
 
+def output(mystr):
+    print >>sys.stderr, mystr,
+
+def main():
+    parser = argparse.ArgumentParser()
+    parser.add_argument('--bounce', action='store_true')
+    parser.add_argument('--tail', action='store_true')
+    parser.add_argument('--wait', action='store_true')
+    opts = parser.parse_args()
+
+    if opts.tail:
+        cmd_tail()
+        return
+    elif opts.bounce:
+        nm_bounce()
+    elif opts.wait:
+        print 'Waiting:',
+        tests = [ partial(ping, nm_router_ip()), external_ping ]
+        for testfunc in tests:
+            output('{}:'.format(testfunc))
+            while True:
+                if not testfunc():
+                    output('OK ')
+                    break
+                output('.')
+                time.sleep(1)
+        print
+            
+    show_status()
+
+
 if __name__=='__main__':
-    if 1:
-        zoot()
-    else:
-        main()
+    main()
+

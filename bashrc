@@ -30,6 +30,8 @@ export PS1='[\u@\h \W$(__git_ps1 " (%s)")]\$ '
 export CDPATH=~/work
 
 . ~/src/setup/misc/django_bash_completion 
+. ~/src/setup/misc/fabric-completion.bash
+. ~/src/setup/misc/git-completion.bash
 
 
 # :::::::::::::::::::::::::::::::::::::::::::::::::: MISC

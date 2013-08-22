@@ -1,0 +1,15 @@
+#!/bin/bash
+
+# Fix DNS set by misguided internet routers.
+# Copy this file to /etc/NetworkManager/dispatcher.d/50fix-dns
+# Mark script executable.
+#
+# JM 7/2013
+
+cat << EOF > /etc/resolv.conf
+# DONT EDIT
+# see $0
+
+nameserver 4.2.2.2
+EOF
+

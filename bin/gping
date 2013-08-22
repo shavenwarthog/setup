@@ -178,16 +178,17 @@ def main():
         nm_bounce()
         opts.wait = True
 
-    print 'zoot', nm_router_ip()
-
     if opts.wait:
+        def router_ping():
+            return ping(nm_router_ip())
+
         print 'Waiting:',
-        tests = [ partial(ping, nm_router_ip()), external_ping ]
+        tests = [ router_ping, external_ping ]
         for testfunc in tests:
-            output('{}:'.format(testfunc))
+            output('{}:'.format(testfunc.__name__))
             while True:
                 if not testfunc():
-                    output('OK ')
+                    output('OK\n')
                     break
                 output('.')
                 time.sleep(1)

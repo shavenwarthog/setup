@@ -14,7 +14,6 @@ import gevent
 from gevent.queue import Queue
 
 
-
 def ping(ip):
     return os.system('ping -c1 {} 2>/dev/null > /dev/null'.format(ip))
 
@@ -36,7 +35,7 @@ def nm_bounce():
 def nm_router_ip():
     ips = re.findall(
         'dhcp_server_identifier = ([0-9.]+)',
-        os.popen('nmcli dev list').read(),
+        os.popen('nmcli dev list 2> /dev/null').read(),
         )
     return ips[0] if ips else None
 
@@ -177,7 +176,11 @@ def main():
         return
     elif opts.bounce:
         nm_bounce()
-    elif opts.wait:
+        opts.wait = True
+
+    print 'zoot', nm_router_ip()
+
+    if opts.wait:
         print 'Waiting:',
         tests = [ partial(ping, nm_router_ip()), external_ping ]
         for testfunc in tests:

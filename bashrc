@@ -3,22 +3,22 @@
 export PATH=$HOME/bin:$PATH
 
 
-export WORKON_HOME=~/Envs
-# source /usr/local/bin/virtualenvwrapper.sh
 
+# :::::::::::::::::::::::::::::::::::::::::::::::::: ANDROID
 
-# for Chef, via "Test-Driven Infrastructure with Chef"
-[[ -s "~/.rvm/scripts/rvm" ]] && source "~/.rvm/scripts/rvm"
-
+export PATH=$HOME/src/android-sdk/tools:$HOME/src/android-sdk/platform-tools/:$PATH
 
 
 # :::::::::::::::::::::::::::::::::::::::::::::::::: PYTHON
 
 export PIP_DOWNLOAD_CACHE=$HOME/.pip_download_cache
+export WORKON_HOME=~/Envs
+
 
 
 # If not running interactively, don't do anything
 [ -z "$PS1" ] && return
+
 
 # :::::::::::::::::::::::::::::::::::::::::::::::::: PROMPT
 

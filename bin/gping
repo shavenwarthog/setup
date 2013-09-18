@@ -23,8 +23,7 @@ def external_ping():
 
 
 def dns_status(server=None):
-    if server:
-        server = '@'+server
+    server = '@'+server if server else ''
     return os.system('dig {} yahoo.com > /dev/null'.format(server))
 
 
@@ -166,9 +165,16 @@ def output(mystr):
 
 def main():
     parser = argparse.ArgumentParser()
-    parser.add_argument('--bounce', action='store_true')
+    parser.add_argument(
+        '--bounce', action='store_true',
+        help='Bounce network, then ping routers until they return',
+        )
     parser.add_argument('--tail', action='store_true')
-    parser.add_argument('--wait', action='store_true')
+    parser.add_argument(
+        '--wait', action='store_true',
+        help='Ping routers until they return',
+        )
+
     opts = parser.parse_args()
 
     if opts.tail:

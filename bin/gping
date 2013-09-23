@@ -19,7 +19,7 @@ def ping(ip):
 
 
 def external_ping():
-    return ping('4.2.2.2')
+    return ping('8.8.8.8')
 
 
 def dns_status(server=None):

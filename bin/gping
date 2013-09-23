@@ -116,37 +116,6 @@ def printer(source):
         line = source.get()
         print line.strip()
 
-def cmd_tail():
-    source_queue = Queue()
-    filtered_queue = Queue()
-
-    _p = gevent.spawn(printer, filtered_queue)
-    nmpat = NetworkManagerPat()
-    _g = gevent.spawn(grep2(nmpat, source_queue, filtered_queue))
-    follow("/var/log/syslog", source_queue)
-
-
-def OLD_tail():
-    network_pat = re.compile(
-        '(cfg80211|iwlwifi|NetworkManager|wlan0:|wpa_supplicant)'
-        )
-    state_pat = re.compile('interface state: (.+) -> (.+)')
-
-    for line in subprocess.Popen(
-        'tail -1000 /var/log/syslog'.split(),
-        bufsize=1,                  # line buffered
-        stdout=subprocess.PIPE,
-        ).stdout:
-        if not network_pat.search(line):
-            if 0:
-                print '\t?',line,
-            continue
-        m = state_pat.search(line)
-        if not m:
-            print '\t',line,
-            continue
-        print m.groups()
-
 
 def yorn(status):
     return 'ok' if status==0 else 'FAIL'
@@ -163,11 +132,27 @@ def show_status():
 def output(mystr):
     print >>sys.stderr, mystr,
 
+# ::::::::::::::::::::::::::::::::::::::::::::::::::
+
+def cmd_bounce():
+    
+
+def cmd_tail():
+    source_queue = Queue()
+    filtered_queue = Queue()
+
+    _p = gevent.spawn(printer, filtered_queue)
+    nmpat = NetworkManagerPat()
+    _g = gevent.spawn(grep2(nmpat, source_queue, filtered_queue))
+    follow("/var/log/syslog", source_queue)
+
+# ::::::::::::::::::::::::::::::::::::::::::::::::::
+
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument(
         '--bounce', action='store_true',
-        help='Bounce network, then ping routers until they return',
+        help='If down, bounce network, ping routers until they return',
         )
     parser.add_argument('--tail', action='store_true')
     parser.add_argument(
@@ -181,7 +166,7 @@ def main():
         cmd_tail()
         return
     elif opts.bounce:
-        nm_bounce()
+        cmd_bounce()
         opts.wait = True
 
     if opts.wait:

@@ -33,7 +33,7 @@ def install_extra():
     """
     tools every day or two
     """
-    agi('man2html skype')
+    agi('man2html python-ropemacs lynx skype')
 
 
 @task

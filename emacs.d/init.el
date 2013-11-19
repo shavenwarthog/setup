@@ -23,6 +23,12 @@
 
 (setq python-python-command "/home/johnm/Envs/recipeapp/bin/python")
 
+(when nil
+  (setq python-python-command "sudo scapy")
+  (setq python-python-command-args ())
+  )
+
+
 (global-auto-revert-mode t)
 
 
@@ -75,7 +81,7 @@
         (e (if mark-active (max (point) (mark)) (point-max))))
     (shell-command-on-region b e
      "python -mjson.tool" (current-buffer) t)))
-(define-key js-mode-map (kbd "C-c C-f") 'beautify-json)
+;; (define-key js-mode-map (kbd "C-c C-f") 'beautify-json)
 
 
 (when t

@@ -1,10 +1,14 @@
 # -*- shell-script -*-
 
-export PATH=$PATH:/opt/vagrant/bin
+# export PATH=$PATH:/opt/vagrant/bin
 
 export PATH=$HOME/bin:$PATH
-export PATH=$PATH:/opt/msp430-gcc-4.4.3/bin
+# export PATH=$PATH:/opt/msp430-gcc-4.4.3/bin
 # export MANPATH=/opt/msp430-gcc-4.4.3/man
+
+export WORKON_HOME=~/Envs
+source /usr/local/bin/virtualenvwrapper.sh
+
 
 # for Chef, via "Test-Driven Infrastructure with Chef"
 [[ -s "~/.rvm/scripts/rvm" ]] && source "~/.rvm/scripts/rvm"

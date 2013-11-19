@@ -1,7 +1,7 @@
 # -*- shell-script -*-
 
 alias ls='ls -CF'
-alias pygrep='find . -name "*.py" | xargs egrep'
+# alias pygrep='find . -name "*.py" | xargs egrep'
 
 # :::::::::::::::::::::::::::::::::::::::::::::::::: APT
 
@@ -10,13 +10,16 @@ alias acs='apt-cache search'
 
 # :::::::::::::::::::::::::::::::::::::::::::::::::: MISC
 
+# default stop: ALT C-s
+alias recordme='recordmydesktop --no-sound --delay=3'
+
 # alias rgrep='egrep -nri "$@" .'
 
 # setterm -term linux -back black -fore white -clear
 
 # :::::::::::::::::::::::::::::::::::::::::::::::::: GIT
 
-alias c='git commit -am'
+# alias c='git commit -am'
 alias gb='git branch'
 # alias gcm='git commit -m 
 alias gd='git diff'

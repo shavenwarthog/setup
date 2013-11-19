@@ -14,18 +14,16 @@ import gevent
 from gevent.queue import Queue
 
 
-
 def ping(ip):
     return os.system('ping -c1 {} 2>/dev/null > /dev/null'.format(ip))
 
 
 def external_ping():
-    return ping('4.2.2.2')
+    return ping('8.8.8.8')
 
 
 def dns_status(server=None):
-    if server:
-        server = '@'+server
+    server = '@'+server if server else ''
     return os.system('dig {} yahoo.com > /dev/null'.format(server))
 
 
@@ -36,7 +34,7 @@ def nm_bounce():
 def nm_router_ip():
     ips = re.findall(
         'dhcp_server_identifier = ([0-9.]+)',
-        os.popen('nmcli dev list').read(),
+        os.popen('nmcli dev list 2> /dev/null').read(),
         )
     return ips[0] if ips else None
 
@@ -118,37 +116,6 @@ def printer(source):
         line = source.get()
         print line.strip()
 
-def cmd_tail():
-    source_queue = Queue()
-    filtered_queue = Queue()
-
-    _p = gevent.spawn(printer, filtered_queue)
-    nmpat = NetworkManagerPat()
-    _g = gevent.spawn(grep2(nmpat, source_queue, filtered_queue))
-    follow("/var/log/syslog", source_queue)
-
-
-def OLD_tail():
-    network_pat = re.compile(
-        '(cfg80211|iwlwifi|NetworkManager|wlan0:|wpa_supplicant)'
-        )
-    state_pat = re.compile('interface state: (.+) -> (.+)')
-
-    for line in subprocess.Popen(
-        'tail -1000 /var/log/syslog'.split(),
-        bufsize=1,                  # line buffered
-        stdout=subprocess.PIPE,
-        ).stdout:
-        if not network_pat.search(line):
-            if 0:
-                print '\t?',line,
-            continue
-        m = state_pat.search(line)
-        if not m:
-            print '\t',line,
-            continue
-        print m.groups()
-
 
 def yorn(status):
     return 'ok' if status==0 else 'FAIL'
@@ -165,26 +132,54 @@ def show_status():
 def output(mystr):
     print >>sys.stderr, mystr,
 
+# ::::::::::::::::::::::::::::::::::::::::::::::::::
+
+def cmd_bounce():
+    
+
+def cmd_tail():
+    source_queue = Queue()
+    filtered_queue = Queue()
+
+    _p = gevent.spawn(printer, filtered_queue)
+    nmpat = NetworkManagerPat()
+    _g = gevent.spawn(grep2(nmpat, source_queue, filtered_queue))
+    follow("/var/log/syslog", source_queue)
+
+# ::::::::::::::::::::::::::::::::::::::::::::::::::
+
 def main():
     parser = argparse.ArgumentParser()
-    parser.add_argument('--bounce', action='store_true')
+    parser.add_argument(
+        '--bounce', action='store_true',
+        help='If down, bounce network, ping routers until they return',
+        )
     parser.add_argument('--tail', action='store_true')
-    parser.add_argument('--wait', action='store_true')
+    parser.add_argument(
+        '--wait', action='store_true',
+        help='Ping routers until they return',
+        )
+
     opts = parser.parse_args()
 
     if opts.tail:
         cmd_tail()
         return
     elif opts.bounce:
-        nm_bounce()
-    elif opts.wait:
+        cmd_bounce()
+        opts.wait = True
+
+    if opts.wait:
+        def router_ping():
+            return ping(nm_router_ip())
+
         print 'Waiting:',
-        tests = [ partial(ping, nm_router_ip()), external_ping ]
+        tests = [ router_ping, external_ping ]
         for testfunc in tests:
-            output('{}:'.format(testfunc))
+            output('{}:'.format(testfunc.__name__))
             while True:
                 if not testfunc():
-                    output('OK ')
+                    output('OK\n')
                     break
                 output('.')
                 time.sleep(1)

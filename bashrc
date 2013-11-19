@@ -1,10 +1,6 @@
 # -*- shell-script -*-
 
-# export PATH=$PATH:/opt/vagrant/bin
-
 export PATH=$HOME/bin:$PATH
-# export PATH=$PATH:/opt/msp430-gcc-4.4.3/bin
-# export MANPATH=/opt/msp430-gcc-4.4.3/man
 
 export WORKON_HOME=~/Envs
 source /usr/local/bin/virtualenvwrapper.sh
@@ -13,14 +9,22 @@ source /usr/local/bin/virtualenvwrapper.sh
 # for Chef, via "Test-Driven Infrastructure with Chef"
 [[ -s "~/.rvm/scripts/rvm" ]] && source "~/.rvm/scripts/rvm"
 
-	
+
+# :::::::::::::::::::::::::::::::::::::::::::::::::: ANDROID
+
+# export PATH=$HOME/src/android-sdk/tools:$HOME/src/android-sdk/platform-tools/:$PATH
+
+
 # :::::::::::::::::::::::::::::::::::::::::::::::::: PYTHON
 
 export PIP_DOWNLOAD_CACHE=$HOME/.pip_download_cache
+export WORKON_HOME=~/Envs
+
 
 
 # If not running interactively, don't do anything
 [ -z "$PS1" ] && return
+
 
 # :::::::::::::::::::::::::::::::::::::::::::::::::: PROMPT
 
@@ -30,6 +34,10 @@ export PS1='[\u@\h \W$(__git_ps1 " (%s)")]\$ '
 # :::::::::::::::::::::::::::::::::::::::::::::::::: WORK
 
 export CDPATH=~/work
+
+. ~/src/setup/misc/django_bash_completion 
+. ~/src/setup/misc/fabric-completion.bash
+. ~/src/setup/misc/git-completion.bash
 
 
 # :::::::::::::::::::::::::::::::::::::::::::::::::: MISC
@@ -164,3 +172,4 @@ set page-completions off
 
 # . /etc/bash_completion.d/django_bash_completion
 # compleat
+PATH="${PATH}:/home/johnm/src/android-sdk/tools"

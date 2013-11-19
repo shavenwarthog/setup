@@ -2,7 +2,7 @@
 (add-to-list 'load-path "~/.emacs.d/internet/")
 
 ;; :::::::::::::::::::::::::::::::::::::::::::::::::: SAFE TOOLS
- 
+
 (global-set-key
  [f7]
  (lambda () (interactive)
@@ -21,7 +21,13 @@
 
 ;; :::::::::::::::::::::::::::::::::::::::::::::::::: CUSTOMIZATION
 
-(setq python-python-command "/home/johnm/Envs/recipeapp/bin/python")
+;; (setq python-python-command "/home/johnm/Envs/recipeapp/bin/python")
+
+(when nil
+  (setq python-python-command "sudo scapy")
+  (setq python-python-command-args ())
+  )
+
 
 (when nil
   (setq python-python-command "sudo scapy")
@@ -55,9 +61,9 @@
   (setq 
    ido-create-new-buffer (quote never)
    ido-enable-flex-matching t ;; enable fuzzy matching
-   ido-enable-last-directory-history nil
+   ;; ido-enable-last-directory-history nil
    ido-enable-regexp nil
-   ido-max-directory-size 10000
+   ;; ido-max-directory-size 10000
    ;; ido-max-file-prompt-width 0.1        ;??
    ;; ido-use-filename-at-point (quote guess) ;??
    ;; ido-use-url-at-point t                  ;??
@@ -102,7 +108,7 @@
 
 ;; :::::::::::::::::::::::::::::::::::::::::::::::::: EPROJECT
 
-(load "eproject")
+;; (load "eproject")
 
 
 ;; ################################################## HISTORICAL
@@ -177,8 +183,13 @@
   (global-set-key (kbd "S-<f10>") 'jm-insert-goodvalue))
 
 (when t
-  (load "~/src/sunlight/jmcompile" t)
-  (global-set-key (kbd "C-S-<return>") 'jmc-recompile))
+  (defun jm-recompile ()
+    "Save buffers, recompile."
+    (interactive)
+    (save-some-buffers t)
+    (recompile))
+  (global-set-key (kbd "C-S-<return>") 'jm-recompile))
+
   
 (when (require 'js)
   (define-key js-mode-map (kbd "<f10>") 'jm-logme)
@@ -255,10 +266,15 @@
 ;;   (define-key js-mode-map (kbd "M-.") 'find-tag))
 
 ;; ;; M-/ dabbrev-expand
-;; (when nil
-;;   (when (require 'pymacs)
-;;     (setq ropemacs-confirm-saving nil)
-;;     (pymacs-load "ropemacs" "rope-")))
+(when nil
+  (when (require 'pymacs)
+    (setq ropemacs-confirm-saving nil)
+    (pymacs-load "ropemacs" "rope-")
+    (define-key python-mode-map (kbd "M-/") 'dabbrev-expand)
+    (fmakunbound 'rope-code-assist)))
+
+
+
 
 
 ;; ;; (local-set-key;; M-/ dabbrev-expand

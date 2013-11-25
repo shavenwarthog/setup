@@ -22,6 +22,10 @@ def external_ping():
     return ping('8.8.8.8')
 
 
+def router_ping():
+    return ping(nm_router_ip())
+
+
 def dns_status(server=None):
     server = '@'+server if server else ''
     return os.system('dig {} yahoo.com > /dev/null'.format(server))
@@ -135,7 +139,9 @@ def output(mystr):
 # ::::::::::::::::::::::::::::::::::::::::::::::::::
 
 def cmd_bounce():
-    
+    if ping(nm_router_ip()):
+        nm_bounce()       
+
 
 def cmd_tail():
     source_queue = Queue()
@@ -170,9 +176,6 @@ def main():
         opts.wait = True
 
     if opts.wait:
-        def router_ping():
-            return ping(nm_router_ip())
-
         print 'Waiting:',
         tests = [ router_ping, external_ping ]
         for testfunc in tests:
